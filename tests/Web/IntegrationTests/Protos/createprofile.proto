@@ -1,0 +1,32 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+
+
+option csharp_namespace = "GrpcProfileService";
+message CreateProfileRequest{
+    string email = 1;
+
+    string password = 2;
+
+    string login = 3;
+}
+
+message ProfileResponse{
+    string id = 1;
+
+    UserResponse user = 2;
+}
+
+message UserResponse{
+    string email = 1;
+
+    string password = 2;
+
+    string login = 3;
+
+    google.protobuf.Timestamp createdAt = 4;
+}
+
+service Profile{
+    rpc CreateProfile (CreateProfileRequest) returns(ProfileResponse);
+}

@@ -1,0 +1,6 @@
+---
+ASPNETCORE_ENVIRONMENT: Production
+LOGSTASH_URL: http://localhost:8080
+MONGODB_CONNECTION_STRING: mongodb://localhost:27018
+DB_NAME: kip_profile_db
+COLLECTION_NAME: profiles
