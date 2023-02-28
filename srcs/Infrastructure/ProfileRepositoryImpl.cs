@@ -17,24 +17,24 @@ public class ProfileRepositoryImpl : ProfileRepository
     }
 
 
-    UpdateDefinition<Profile> AddChild(ChildProfile profile) => Builders<Profile>.Update.AddToSet(p => p.Childs, profile);
+    static UpdateDefinition<Profile> AddChild(ChildProfile profile) => Builders<Profile>.Update.AddToSet(p => p.Childs, profile);
 
-    UpdateDefinition<Profile> DeleteChild(string name) => Builders<Profile>.Update.PullFilter(p => p.Childs, p => p.Name == name);
-
-
-    UpdateDefinition<Profile> AddWatched(string filmId) => Builders<Profile>.Update.AddToSet(p => p.Watched, filmId);
-
-    UpdateDefinition<Profile> DeleteWatched(string filmId) => Builders<Profile>.Update.Pull(p => p.Watched, filmId);
+    static UpdateDefinition<Profile> DeleteChild(string name) => Builders<Profile>.Update.PullFilter(p => p.Childs, p => p.Name == name);
 
 
-    UpdateDefinition<Profile> AddWillWatch(string filmId) => Builders<Profile>.Update.AddToSet(p => p.WillWatch, filmId);
+    static UpdateDefinition<Profile> AddWatched(string filmId) => Builders<Profile>.Update.AddToSet(p => p.Watched, filmId);
 
-    UpdateDefinition<Profile> DeleteWillWatch(string filmId) => Builders<Profile>.Update.Pull(p => p.WillWatch, filmId);
+    static UpdateDefinition<Profile> DeleteWatched(string filmId) => Builders<Profile>.Update.Pull(p => p.Watched, filmId);
 
 
-    UpdateDefinition<Profile> AddScored(string filmId) => Builders<Profile>.Update.AddToSet(p => p.Scored, filmId);
+    static UpdateDefinition<Profile> AddWillWatch(string filmId) => Builders<Profile>.Update.AddToSet(p => p.WillWatch, filmId);
 
-    UpdateDefinition<Profile> DeleteScored(string filmId) => Builders<Profile>.Update.Pull(p => p.Scored, filmId);
+    static UpdateDefinition<Profile> DeleteWillWatch(string filmId) => Builders<Profile>.Update.Pull(p => p.WillWatch, filmId);
+
+
+    static UpdateDefinition<Profile> AddScored(string filmId) => Builders<Profile>.Update.AddToSet(p => p.Scored, filmId);
+
+    static UpdateDefinition<Profile> DeleteScored(string filmId) => Builders<Profile>.Update.Pull(p => p.Scored, filmId);
 
     public async Task<bool> AddChildProfile(CreateChildProfileDto profileInfo, CancellationToken token = default)
     {
@@ -65,7 +65,7 @@ public class ProfileRepositoryImpl : ProfileRepository
     {
         var findResult = await _profileRepo.FindAsync(t => t.Id == id, cancellationToken: token);
 
-        var profile = await findResult.FirstOrDefaultAsync();
+        var profile = await findResult.FirstOrDefaultAsync(token);
 
         return profile.Adapt<ProfileDto>();
     }
@@ -73,11 +73,11 @@ public class ProfileRepositoryImpl : ProfileRepository
     public async Task<long> CountBy(string? email = null, string? login = null, CancellationToken token = default)
     {
         if (email is not null && login is not null)
-            return await _profileRepo.CountDocumentsAsync(f => (f.User.Email == email || f.User.Login == login), cancellationToken: token);
+            return await _profileRepo.CountDocumentsAsync(f => f.User.Email == email || f.User.Login == login, cancellationToken: token);
         if (email is not null)
-            return await _profileRepo.CountDocumentsAsync(f => (f.User.Email == email), cancellationToken: token);
+            return await _profileRepo.CountDocumentsAsync(f => f.User.Email == email, cancellationToken: token);
         if (login is not null)
-            return await _profileRepo.CountDocumentsAsync(f => (f.User.Login == login), cancellationToken: token);
+            return await _profileRepo.CountDocumentsAsync(f => f.User.Login == login, cancellationToken: token);
         else
             return await _profileRepo.CountDocumentsAsync(t => true, cancellationToken: token);
     }

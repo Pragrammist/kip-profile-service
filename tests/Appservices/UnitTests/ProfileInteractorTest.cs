@@ -29,18 +29,24 @@ public class ProfileInteractorTest
         SetCreatepProfileMethod(repo);
         return repo.Object;
     }
+    ContentBridge GetMockContentBridge()
+    {
+        var repo = new Mock<ContentBridge>();
+
+        return repo.Object;
+    }
 
     void SetCreatepProfileMethod(Mock<ProfileRepository> repo)
     {
         repo.Setup(repo => repo.CreateProfile(It.IsAny<CreateProfileDto>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ProfileDto { Id = "someProfileId" });
     }
-    ProfileInteractor ProfileInteractor(ProfileRepository repo) => new ProfileInteractor(repo);
+    ProfileInteractor ProfileInteractor(ProfileRepository repo, ContentBridge bridge) => new(repo, bridge);
 
 
     [Fact]
     public async Task CreateExistingUser()
     {
-        var interactor = ProfileInteractor(GetProfileRepoForCreateProfileForExistingUser());
+        var interactor = ProfileInteractor(GetProfileRepoForCreateProfileForExistingUser(), GetMockContentBridge());
 
 
         await Assert.ThrowsAsync<UserAlreadyExistsException>(async () => await interactor.Create(new CreateProfileDto { Login = loginThatExists }));
@@ -48,7 +54,7 @@ public class ProfileInteractorTest
     [Fact]
     public async Task CreateNotExistingUser()
     {
-        var interactor = ProfileInteractor(GetProfileRepoForCreateProfileForNotExistingUser());
+        var interactor = ProfileInteractor(GetProfileRepoForCreateProfileForNotExistingUser(), GetMockContentBridge());
         var res = await interactor.Create(new CreateProfileDto { Email = emailThatDoesntExists });
         res.Id.Should().NotBeNull();
     }

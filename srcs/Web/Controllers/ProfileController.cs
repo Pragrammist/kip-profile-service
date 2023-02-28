@@ -28,7 +28,6 @@ public class ProfileController : ControllerBase
     /// </summary>
     /// <remarks>
     /// Если нужно создать пользователя, которого еще нет в кинопосике, то нужно пользоваться этим методом. 
-    /// Т.е. USER НЕ СОЗДАЕТСЯ В КОНТРОЛЛЕРЕ USER, 
     /// как бы не звучало парадоксально, но связано это с тем, чтобы была целостность данных.
     /// userId: айди, который authService создал
     /// </remarks>
@@ -91,7 +90,7 @@ public class ProfileController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> WatchedPost(string profileId, string filmID, CancellationToken cancellation)
     {
-        var isSuccess = await _profile.AddWatchded(profileId, filmID, cancellation);
+        var isSuccess = await _profile.AddWatched(profileId, filmID, cancellation);
         if (isSuccess)
             return Ok();
         else
@@ -102,32 +101,32 @@ public class ProfileController : ControllerBase
     [HttpDelete]
     public async Task<IActionResult> WatchedDelete(string profileId, string filmID, CancellationToken cancellation)
     {
-        var isSuccess = await _profile.DeleteWatchded(profileId, filmID, cancellation);
+        var isSuccess = await _profile.DeleteWatched(profileId, filmID, cancellation);
         if (isSuccess)
             return Ok();
         else
             return BadRequest();
     }
 
-    [Route("~/scored/{profileId}/{filmID}")]
+    [Route("~/scored/{score}/{profileId}/{filmID}")]
     [HttpPost]
-    public async Task<IActionResult> ScoredPost(string profileId, string filmID, CancellationToken cancellation)
+    public async Task<IActionResult> ScoredPost(string profileId, string filmID, uint score, CancellationToken cancellation)
     {
-        var isSuccess = await _profile.AddScored(profileId, filmID, cancellation);
+        var isSuccess = await _profile.AddScored(profileId, filmID, score, cancellation);
         if (isSuccess)
             return Ok();
         else
             return BadRequest();
     }
 
-    [Route("~/scored/{profileId}/{filmID}")]
-    [HttpDelete]
-    public async Task<IActionResult> ScoredDelete(string profileId, string filmID, CancellationToken cancellation)
-    {
-        var isSuccess = await _profile.DeleteScored(profileId, filmID, cancellation);
-        if (isSuccess)
-            return Ok();
-        else
-            return BadRequest();
-    }
+    // [Route("~/scored/{profileId}/{filmID}")]
+    // [HttpDelete]
+    // public async Task<IActionResult> ScoredDelete(string profileId, string filmID, CancellationToken cancellation)
+    // {
+    //     var isSuccess = await _profile.DeleteScored(profileId, filmID, cancellation);
+    //     if (isSuccess)
+    //         return Ok();
+    //     else
+    //         return BadRequest();
+    // }
 }

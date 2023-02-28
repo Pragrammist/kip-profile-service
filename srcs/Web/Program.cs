@@ -19,8 +19,7 @@ public class Program
         var dbName = configuration["DB_NAME"] ?? "kip_profile_db";
         var collections = configuration["COLLECTION_NAME"] ?? "profiles";
         services.AddMongoDb(connection, dbName, collections);
-        services.AddScoped<ProfileRepository, ProfileRepositoryImpl>();
-        services.AddScoped<ProfileInteractor>();
+        services.AddAppServices();
     }
 
     public static void Main(string[] args)
@@ -44,7 +43,7 @@ public class Program
 
     private static void AppBuild(string[] args)
     {
-        MapsterBuilder.ConfigureMapster();
+        //MapsterBuilder.ConfigureMapster();
         var builder = WebApplication.CreateBuilder(args);
         builder.Configuration.AddValueFromYmlVar();
 
@@ -58,7 +57,6 @@ public class Program
             .CreateLogger();
 
         builder.Host.UseSerilog();
-
         builder.Services.AddControllers();
         builder.Services.AddGrpc(opt =>
         {

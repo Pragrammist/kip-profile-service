@@ -60,7 +60,7 @@ public class ChildProfileWebTest
     public async Task Post()
     {
         var child = await CreateChild();
-        var responseMessage = await _webContext.Client.PostAsJsonAsync(url, child);
+        var responseMessage = await _webContext.HttpClient.PostAsJsonAsync(url, child);
 
         responseMessage.IsSuccessStatusCode.Should().BeTrue();
     }
@@ -70,7 +70,7 @@ public class ChildProfileWebTest
     {
         var child = await CreateChildProfile();
         var requestArg = $"?profileId={child.ProfileId}&name={child.Name}";
-        var responseMessage = await _webContext.Client.DeleteAsync(url + requestArg);
+        var responseMessage = await _webContext.HttpClient.DeleteAsync(url + requestArg);
 
         responseMessage.IsSuccessStatusCode.Should().BeTrue();
     }
@@ -94,7 +94,7 @@ public class ChildProfileWebTest
     async Task<string> CreateProfile()
     {
         var userToPost = FillRandmlyUserField();
-        var postResponseMessage = await _webContext.Client.PostAsJsonAsync(profileUrlPost, userToPost);
+        var postResponseMessage = await _webContext.HttpClient.PostAsJsonAsync(profileUrlPost, userToPost);
 
         var json = await postResponseMessage?.Content?.ReadAsStringAsync();
         var jsobj = JObject.Parse(json);
@@ -106,7 +106,7 @@ public class ChildProfileWebTest
     async Task<ChildProfileToSend> CreateChildProfile()
     {
         var child = await CreateChild();
-        var responseMessage = await _webContext.Client.PostAsJsonAsync(url, child);
+        var responseMessage = await _webContext.HttpClient.PostAsJsonAsync(url, child);
         return child;
     }
 

@@ -21,7 +21,7 @@ public static class ProfileMongoExtentsions
             bdConfiguration.Build();
             return db;
         });
-        services.AddScoped<IMongoCollection<Profile>>(p =>
+        services.AddSingleton<IMongoCollection<Profile>>(p =>
         {
             var db = p.GetRequiredService<IMongoDatabase>();
             return db.GetCollection<Profile>(mongoCollectionName);

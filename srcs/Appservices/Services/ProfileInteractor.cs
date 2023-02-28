@@ -6,10 +6,12 @@ namespace Appservices;
 
 public class ProfileInteractor
 {
-    ProfileRepository _repo;
-    public ProfileInteractor(ProfileRepository repo)
+    readonly ProfileRepository _repo;
+    readonly ContentBridge _contentBridge;
+    public ProfileInteractor(ProfileRepository repo, ContentBridge contentBridge)
     {
         _repo = repo;
+        _contentBridge = contentBridge;
     }
 
     public async Task<ProfileDto> Create(CreateProfileDto profileInfoDto, CancellationToken token = default)
@@ -38,41 +40,47 @@ public class ProfileInteractor
     }
     public async Task<ProfileDto> GetProfile(string profileId, CancellationToken token = default)
     {
-        var res = await _repo.FetchProfile(profileId);
+        var res = await _repo.FetchProfile(profileId, token);
 
         return res;
     }
 
 
-    public async Task<bool> AddWatchded(string profileId, string filmId, CancellationToken token = default)
+    public async Task<bool> AddWatched(string profileId, string filmId, CancellationToken token = default)
     {
-        var res = await _repo.AddWatched(profileId, filmId, token);
-
-        return res;
+        var isAdded = await _contentBridge.AddWatched(filmId, token);
+        if(!isAdded)
+            return false;
+        return await _repo.AddWatched(profileId, filmId, token);
     }
-    public async Task<bool> DeleteWatchded(string profileId, string filmId, CancellationToken token = default)
+    public async Task<bool> DeleteWatched(string profileId, string filmId, CancellationToken token = default)
     {
-        var res = await _repo.DeleteWatched(profileId, filmId, token);
-
-        return res;
+        var isAdded = await _contentBridge.DeleteWatched(filmId, token);
+        if(!isAdded)
+            return false;
+        
+        return await _repo.DeleteWatched(profileId, filmId, token);
     }
     public async Task<bool> AddWillWatch(string profileId, string filmId, CancellationToken token = default)
     {
-        var res = await _repo.AddWillWatch(profileId, filmId, token);
-
-        return res;
+        var isAdded = await _contentBridge.AddWillWatch(filmId, token);
+        if(!isAdded)
+            return false;
+        return await _repo.AddWillWatch(profileId, filmId, token);
     }
     public async Task<bool> DeleteWillWatch(string profileId, string filmId, CancellationToken token = default)
     {
-        var res = await _repo.DeleteWillWatch(profileId, filmId, token);
-
-        return res;
+        var isAdded = await _contentBridge.DeleteWillWatch(filmId, token);
+        if(!isAdded)
+            return false;
+        return await _repo.DeleteWillWatch(profileId, filmId, token);
     }
-    public async Task<bool> AddScored(string profileId, string filmId, CancellationToken token = default)
+    public async Task<bool> AddScored(string profileId, string filmId, uint score, CancellationToken token = default)
     {
-        var res = await _repo.AddScored(profileId, filmId, token);
-
-        return res;
+        var isAdded = await _contentBridge.AddScore(filmId, score, token);
+        if(!isAdded)
+            return false;
+        return await _repo.AddScored(profileId, filmId, token);
     }
     public async Task<bool> DeleteScored(string profileId, string filmId, CancellationToken token = default)
     {
