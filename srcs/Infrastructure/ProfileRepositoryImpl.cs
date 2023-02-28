@@ -123,4 +123,15 @@ public class ProfileRepositoryImpl : ProfileRepository
 
         return res.ModifiedCount > 0;
     }
+
+    public async Task<ProfileDto?> GetProfile(string profileId, CancellationToken token = default) => 
+    (
+        await 
+        (
+            await _profileRepo.FindAsync(p => p.Id == profileId, cancellationToken: token)
+        )
+        .FirstOrDefaultAsync(cancellationToken: token)
+    )
+    .Adapt<ProfileDto>();
+
 }

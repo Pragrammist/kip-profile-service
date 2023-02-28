@@ -12,6 +12,8 @@ namespace IntegrationTests;
 [Collection("MongoDb")]
 public class ProfileRepositoryImplTest
 {
+    // !!!!!!!
+    // У РЕИЛИЗАЦИИ РЕПОЗИТОРИЯ НЕТ ПРОВЕРКИ НА ВАЛИДНОСТЬ, УНИКОЛЬНОСТЬ И ПРАВИЛЬНОСТЬ ДАННЫХ, ПОЭТОМУ ЗДЕСЬ ВМЕСТО АЙДИ ФИЛЬМОВ ПОДСТАВЛЯЕТСЯ ПРОИЗВОЛЬНАЯ СТРОКА
     IMongoCollection<Profile> _repo;
     CreateProfileDto createProfile => new CreateProfileDto { Email = "someemail", Login = "somelogin", Password = "somepassword" };
     CreateChildProfileDto createChildProfileDto(string profileId) => new CreateChildProfileDto { Age = 0, Gender = 0, Name = "name", ProfileId = profileId };
@@ -22,6 +24,18 @@ public class ProfileRepositoryImplTest
         _profileRepo = new ProfileRepositoryImpl(_repo);
         MapsterBuilder.ConfigureMapster();
     }
+
+    [Fact]
+    public async Task GetProfileTest()
+    {
+        var profile = await _profileRepo.CreateProfile(createProfile);
+
+        var profileRes = await _profileRepo.GetProfile(profile.Id);
+
+        profileRes.Should().NotBeNull();
+    }
+
+
     [Fact]
     public async Task CreateProfile()
     {

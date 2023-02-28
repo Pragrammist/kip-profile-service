@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using Xunit;
 using Moq;
@@ -36,6 +37,17 @@ public class ProfileInteractorTest
         return repo.Object;
     }
 
+    ProfileRepository GetProfileRepoForFavourites()
+    {
+        var repo = new Mock<ProfileRepository>();
+        repo.Setup(repo => repo.GetProfile(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ProfileDto{
+            Id = "someProfileId",
+            Watched = new List<string> {"filmid"},
+            WhillWatch = new List<string> {"filmid"},
+            Scored = new List<string> {"filmid"}
+        });
+        return repo.Object;
+    }
     void SetCreatepProfileMethod(Mock<ProfileRepository> repo)
     {
         repo.Setup(repo => repo.CreateProfile(It.IsAny<CreateProfileDto>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ProfileDto { Id = "someProfileId" });
@@ -51,11 +63,44 @@ public class ProfileInteractorTest
 
         await Assert.ThrowsAsync<UserAlreadyExistsException>(async () => await interactor.Create(new CreateProfileDto { Login = loginThatExists }));
     }
+
     [Fact]
     public async Task CreateNotExistingUser()
     {
         var interactor = ProfileInteractor(GetProfileRepoForCreateProfileForNotExistingUser(), GetMockContentBridge());
         var res = await interactor.Create(new CreateProfileDto { Email = emailThatDoesntExists });
         res.Id.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task AddExistingWatchedFilm()
+    {
+        var interactor = ProfileInteractor(GetProfileRepoForFavourites(), GetMockContentBridge());
+
+        var res = await interactor.AddWatched("profileid", "filmid");
+
+        res.Should().BeFalse();
+    }
+
+
+    [Fact]
+    public async Task AddExistingScoredFilm()
+    {
+        var interactor = ProfileInteractor(GetProfileRepoForFavourites(), GetMockContentBridge());
+
+        var res = await interactor.AddScored("profileid", "filmid", 5);
+
+        res.Should().BeFalse();
+    }
+
+
+    [Fact]
+    public async Task AddExistingWillWatchFilm()
+    {
+        var interactor = ProfileInteractor(GetProfileRepoForFavourites(), GetMockContentBridge());
+
+        var res = await interactor.AddScored("profileid", "filmid", 5);
+
+        res.Should().BeFalse();
     }
 }

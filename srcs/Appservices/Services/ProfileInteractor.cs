@@ -48,6 +48,14 @@ public class ProfileInteractor
 
     public async Task<bool> AddWatched(string profileId, string filmId, CancellationToken token = default)
     {
+        var profile = await _repo.GetProfile(profileId, token);
+        
+        if(profile is null)
+            return false;
+
+        if(profile.Watched.Contains(filmId))
+            return false;
+            
         var isAdded = await _contentBridge.AddWatched(filmId, token);
         if(!isAdded)
             return false;
@@ -63,6 +71,15 @@ public class ProfileInteractor
     }
     public async Task<bool> AddWillWatch(string profileId, string filmId, CancellationToken token = default)
     {
+        var profile = await _repo.GetProfile(profileId, token);
+        
+        if(profile is null)
+            return false;
+
+        if(profile.WhillWatch.Contains(filmId))
+            return false;
+
+
         var isAdded = await _contentBridge.AddWillWatch(filmId, token);
         if(!isAdded)
             return false;
@@ -77,6 +94,15 @@ public class ProfileInteractor
     }
     public async Task<bool> AddScored(string profileId, string filmId, uint score, CancellationToken token = default)
     {
+        var profile = await _repo.GetProfile(profileId, token);
+        
+        if(profile is null)
+            return false;
+
+        if(profile.Scored.Contains(filmId))
+            return false;
+
+
         var isAdded = await _contentBridge.AddScore(filmId, score, token);
         if(!isAdded)
             return false;

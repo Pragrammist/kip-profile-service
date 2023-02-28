@@ -81,6 +81,7 @@ public class ProfileInteractorIntegrationTests : IClassFixture<DbFixture>
 
         filmWillWatchCounter.Should().BeGreaterThan(0);
     }
+    
 
     [Fact]
     public async Task AddScore()

@@ -8,6 +8,9 @@ namespace Appservices;
 
 public interface ProfileRepository
 {
+
+    Task<ProfileDto?> GetProfile(string profileId, CancellationToken token = default);
+
     Task<bool> AddChildProfile(CreateChildProfileDto profileInfo, CancellationToken token = default);
 
     Task<bool> RemoveChildProfile(string profileId, string name, CancellationToken token = default);
