@@ -30,12 +30,17 @@ public class ProfileInteractorIntegrationTests : IClassFixture<DbFixture>
     ProfileInteractor GetProfileInteractor()
     {
         var repo = new ProfileRepositoryImpl(_fixture.Collection);
+        var interactor = new ProfileInteractor(repo);
+        return interactor;
+    }
+    ProfileFavouritesInteractor GetFavInteractor()
+    {
+        var repo = new ProfileRepositoryImpl(_fixture.Collection);
         var channel = GrpcChannel.ForAddress(CONTENT_SERIVCE_HTTP2_URL);
-        
         var grpcContentClient = new FilmServiceProto.FilmServiceProtoClient(channel);
         var bridge = new ContentBridgeImpl(grpcContentClient);
-        var interactor = new ProfileInteractor(repo, bridge);
-        return interactor;
+        var favouritesInteractor = new ProfileFavouritesInteractor(repo, bridge);
+        return favouritesInteractor;
     }
 
     [Fact]
@@ -66,18 +71,20 @@ public class ProfileInteractorIntegrationTests : IClassFixture<DbFixture>
     [Fact]
     public async Task AddWillWatch()
     {
+        var favInteractor = GetFavInteractor();
         var interactor = GetProfileInteractor();
 
-        var filmWillWatchCounter = await CreateProfileAndFilmWithAdding("willWatchCount", interactor, interactor.AddWillWatch);
+        var filmWillWatchCounter = await CreateProfileAndFilmWithAdding("willWatchCount", interactor, favInteractor.AddWillWatch);
 
         filmWillWatchCounter.Should().BeGreaterThan(0);
     }
     [Fact]
     public async Task AddWatched()
     {
+       var favInteractor = GetFavInteractor();
         var interactor = GetProfileInteractor();
 
-        var filmWillWatchCounter = await CreateProfileAndFilmWithAdding("watchedCount", interactor, interactor.AddWatched);
+        var filmWillWatchCounter = await CreateProfileAndFilmWithAdding("watchedCount", interactor, favInteractor.AddWatched);
 
         filmWillWatchCounter.Should().BeGreaterThan(0);
     }
@@ -86,9 +93,10 @@ public class ProfileInteractorIntegrationTests : IClassFixture<DbFixture>
     [Fact]
     public async Task AddScore()
     {
+        var favInteractor = GetFavInteractor();
         var interactor = GetProfileInteractor();
 
-        var filmWillWatchCounter = await CreateProfileAndFilmWithAdding("scoreCount", interactor, interactor.AddScored);
+        var filmWillWatchCounter = await CreateProfileAndFilmWithAdding("scoreCount", interactor, favInteractor.AddScored);
 
         filmWillWatchCounter.Should().BeGreaterThan(0);
     }
@@ -97,18 +105,20 @@ public class ProfileInteractorIntegrationTests : IClassFixture<DbFixture>
     [Fact]
     public async Task DeleteWillWatch()
     {
+        var favInteractor = GetFavInteractor();
         var interactor = GetProfileInteractor();
 
-        var filmWillWatchCounter = await CreateProfileAndFilmWithAddingAndDeleting("willWatchCount", interactor, interactor.AddWillWatch, interactor.DeleteWillWatch);
+        var filmWillWatchCounter = await CreateProfileAndFilmWithAddingAndDeleting("willWatchCount", interactor, favInteractor.AddWillWatch, favInteractor.DeleteWillWatch);
 
         filmWillWatchCounter.Should().BeGreaterThanOrEqualTo(1);
     }
     [Fact]
     public async Task DeleteWatched()
     {
+        var favInteractor = GetFavInteractor();
         var interactor = GetProfileInteractor();
 
-        var filmWillWatchCounter = await CreateProfileAndFilmWithAddingAndDeleting("watchedCount", interactor, interactor.AddWatched, interactor.DeleteWatched);
+        var filmWillWatchCounter = await CreateProfileAndFilmWithAddingAndDeleting("watchedCount", interactor, favInteractor.AddWatched, favInteractor.DeleteWatched);
 
         filmWillWatchCounter.Should().BeGreaterThanOrEqualTo(1);
     }

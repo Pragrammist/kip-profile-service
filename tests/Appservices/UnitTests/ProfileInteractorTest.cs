@@ -52,13 +52,14 @@ public class ProfileInteractorTest
     {
         repo.Setup(repo => repo.CreateProfile(It.IsAny<CreateProfileDto>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ProfileDto { Id = "someProfileId" });
     }
-    ProfileInteractor ProfileInteractor(ProfileRepository repo, ContentBridge bridge) => new(repo, bridge);
+    ProfileInteractor ProfileInteractor(ProfileRepository repo) => new(repo);
 
+    ProfileFavouritesInteractor ProfileFavInteractor(ProfileRepository repo, ContentBridge bridge) => new(repo, bridge);
 
     [Fact]
     public async Task CreateExistingUser()
     {
-        var interactor = ProfileInteractor(GetProfileRepoForCreateProfileForExistingUser(), GetMockContentBridge());
+        var interactor = ProfileInteractor(GetProfileRepoForCreateProfileForExistingUser());
 
 
         await Assert.ThrowsAsync<UserAlreadyExistsException>(async () => await interactor.Create(new CreateProfileDto { Login = loginThatExists }));
@@ -67,7 +68,7 @@ public class ProfileInteractorTest
     [Fact]
     public async Task CreateNotExistingUser()
     {
-        var interactor = ProfileInteractor(GetProfileRepoForCreateProfileForNotExistingUser(), GetMockContentBridge());
+        var interactor = ProfileInteractor(GetProfileRepoForCreateProfileForNotExistingUser());
         var res = await interactor.Create(new CreateProfileDto { Email = emailThatDoesntExists });
         res.Id.Should().NotBeNull();
     }
@@ -75,7 +76,7 @@ public class ProfileInteractorTest
     [Fact]
     public async Task AddExistingWatchedFilm()
     {
-        var interactor = ProfileInteractor(GetProfileRepoForFavourites(), GetMockContentBridge());
+        var interactor = ProfileFavInteractor(GetProfileRepoForFavourites(), GetMockContentBridge());
 
         var res = await interactor.AddWatched("profileid", "filmid");
 
@@ -86,7 +87,7 @@ public class ProfileInteractorTest
     [Fact]
     public async Task AddExistingScoredFilm()
     {
-        var interactor = ProfileInteractor(GetProfileRepoForFavourites(), GetMockContentBridge());
+        var interactor = ProfileFavInteractor(GetProfileRepoForFavourites(), GetMockContentBridge());
 
         var res = await interactor.AddScored("profileid", "filmid", 5);
 
@@ -97,7 +98,7 @@ public class ProfileInteractorTest
     [Fact]
     public async Task AddExistingWillWatchFilm()
     {
-        var interactor = ProfileInteractor(GetProfileRepoForFavourites(), GetMockContentBridge());
+        var interactor = ProfileFavInteractor(GetProfileRepoForFavourites(), GetMockContentBridge());
 
         var res = await interactor.AddScored("profileid", "filmid", 5);
 

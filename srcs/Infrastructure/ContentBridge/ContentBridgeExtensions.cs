@@ -5,7 +5,7 @@ namespace Infrastructure.ContentBridge;
 
 public static class ContentBridgeExtensions
 {
-    public static IServiceCollection AddBridgeClient(this IServiceCollection services, string grpcUri)
+    public static IServiceCollection AddBridgeGrpcClient(this IServiceCollection services, string grpcUri)
     {
         services.AddGrpcClient<FilmServiceProto.FilmServiceProtoClient>(o =>
         {

@@ -12,7 +12,8 @@ public static class AppServicesExtentsions
         services.AddSingleton<ProfileRepository, ProfileRepositoryImpl>();
         services.AddSingleton<ProfileInteractor>();
         services.AddSingleton<Appservices.ContentBridge, ContentBridgeImpl>();
-        services.AddBridgeClient(GrpcContentServiceUri);
+        services.AddSingleton<ProfileFavouritesInteractor>();
+        services.AddBridgeGrpcClient(GrpcContentServiceUri);
         return services;
     }
 }
