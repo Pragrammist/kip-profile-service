@@ -8,6 +8,9 @@ public class ChildProfile
         Age = age;
         Gender = gender;
         Name = name;
+
+        if(string.IsNullOrWhiteSpace(Name))
+            throw new FieldIsNullOrEmptyException(nameof(Name), nameof(ChildProfile));
     }
     int _age;
     public int Age

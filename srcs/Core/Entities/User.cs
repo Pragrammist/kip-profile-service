@@ -1,3 +1,5 @@
+
+
 namespace ProfileService.Core;
 
 //TODO: Exceptions if will needed
@@ -6,15 +8,23 @@ public class User
 {
 
     private User() { }
-    void Constructore(string login, string email, string password)
+    void Constructor(string login, string email, string password)
     {
+        
         Login = login;
         Email = email;
         Password = password;
+
+        if(string.IsNullOrWhiteSpace(Login))
+            throw new FieldIsNullOrEmptyException(nameof(Login), nameof(User));
+        if(string.IsNullOrWhiteSpace(Email))
+            throw new FieldIsNullOrEmptyException(nameof(Email), nameof(User));
+        if(string.IsNullOrWhiteSpace(Password))
+            throw new FieldIsNullOrEmptyException(nameof(Password), nameof(User));
     }
     public User(string login, string email, string password)
     {
-        Constructore(login, email, password);
+        Constructor(login, email, password);
     }
 
     public string Login { get; set; } = null!;

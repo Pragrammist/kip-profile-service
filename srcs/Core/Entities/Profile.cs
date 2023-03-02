@@ -28,13 +28,29 @@ public class Profile
     public IList<ChildProfile> Childs { get => _childs; set => _childs = new Childern(value); }
 
 
-    public IList<string> WillWatch { get => _willWatch; set => _willWatch = new WillWatch(value); }
+    public IList<string> WillWatch { get => _willWatch; set {
+            if(value.Any(s => string.IsNullOrWhiteSpace(s)))
+                throw new NullOrEmptyInnerCollectionException(nameof(WillWatch), nameof(Profile));
+
+            _willWatch = new WillWatch(value);
+        } 
+    }
 
 
-    public IList<string> Scored { get => _scored; set => _scored = new Scored(value); }
+    public IList<string> Scored { get => _scored; set {  
+            if(value.Any(s => string.IsNullOrWhiteSpace(s)))
+                throw new NullOrEmptyInnerCollectionException(nameof(Scored), nameof(Profile));
+
+            _scored = new Scored(value); 
+        } 
+    }
 
 
-    public IList<string> Watched { get => _watched; set => _watched = new Watched(value); }
-
-
+    public IList<string> Watched { get => _watched; set { 
+            if(value.Any(s => string.IsNullOrWhiteSpace(s)))
+                    throw new NullOrEmptyInnerCollectionException(nameof(WillWatch), nameof(Profile));
+                    
+            _watched = new Watched(value); 
+        } 
+    }
 }
