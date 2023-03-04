@@ -93,7 +93,7 @@ public class ProfileWebTest
         var profile = await CreateProfile();
         var film = await CreateFilm();
 
-        var response = await _webFixture.HttpClient.PostAsJsonAsync<object>($"/willwatch/{profile}/{film}", new {});
+        var response = await _webFixture.HttpClient.PutAsJsonAsync<object>($"/willwatch/{profile}/{film}", new {});
 
         response.EnsureSuccessStatusCode();
     }
@@ -103,9 +103,9 @@ public class ProfileWebTest
     {
         var profile = await CreateProfile();
         var film = await CreateFilm();
-        var responseCreating = await _webFixture.HttpClient.PostAsJsonAsync<object>($"/willwatch/{profile}/{film}", new {});
+        var responseCreating = await _webFixture.HttpClient.PutAsJsonAsync<object>($"/willwatch/{profile}/{film}", new {});
 
-        var responseDel = await _webFixture.HttpClient.DeleteAsync($"/willwatch/{profile}/{film}");
+        var responseDel = await _webFixture.HttpClient.PutAsJsonAsync($"/willwatch/delete/{profile}/{film}", new{});
         
         responseDel.EnsureSuccessStatusCode();
     }
@@ -116,7 +116,7 @@ public class ProfileWebTest
         var profile = await CreateProfile();
         var film = await CreateFilm();
 
-        var response = await _webFixture.HttpClient.PostAsJsonAsync<object>($"/watched/{profile}/{film}", new {});
+        var response = await _webFixture.HttpClient.PutAsJsonAsync<object>($"/watched/{profile}/{film}", new {});
 
         response.EnsureSuccessStatusCode();
     }
@@ -126,9 +126,32 @@ public class ProfileWebTest
     {
         var profile = await CreateProfile();
         var film = await CreateFilm();
-        var responseCreating = await _webFixture.HttpClient.PostAsJsonAsync<object>($"/watched/{profile}/{film}", new {});
+        var responseCreating = await _webFixture.HttpClient.PutAsJsonAsync<object>($"/watched/{profile}/{film}", new {});
 
-        var responseDel = await _webFixture.HttpClient.DeleteAsync($"/watched/{profile}/{film}");
+        var responseDel = await _webFixture.HttpClient.PutAsJsonAsync($"/watched/delete/{profile}/{film}", new {});
+        
+        responseDel.EnsureSuccessStatusCode();
+    }
+
+    [Fact]
+    public async Task AddNotInteresting()
+    {
+        var profile = await CreateProfile();
+        var film = await CreateFilm();
+
+        var response = await _webFixture.HttpClient.PutAsJsonAsync<object>($"/notinteresting/{profile}/{film}", new {});
+
+        response.EnsureSuccessStatusCode();
+    }
+
+    [Fact]
+    public async Task DeleteNotInteresting()
+    {
+        var profile = await CreateProfile();
+        var film = await CreateFilm();
+        var responseCreating = await _webFixture.HttpClient.PutAsJsonAsync<object>($"/notinteresting/{profile}/{film}", new {});
+
+        var responseDel = await _webFixture.HttpClient.PutAsJsonAsync($"/notinteresting/delete/{profile}/{film}", new {});
         
         responseDel.EnsureSuccessStatusCode();
     }
@@ -139,7 +162,7 @@ public class ProfileWebTest
         var profile = await CreateProfile();
         var film = await CreateFilm();
         var score = 5;
-        var response = await _webFixture.HttpClient.PostAsJsonAsync<object>($"/scored/{score}/{profile}/{film}", new {});
+        var response = await _webFixture.HttpClient.PutAsJsonAsync<object>($"/scored/{score}/{profile}/{film}", new {});
 
         response.EnsureSuccessStatusCode();
     }

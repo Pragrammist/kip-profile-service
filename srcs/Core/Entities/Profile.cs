@@ -6,7 +6,7 @@ public class Profile
     IList<string> _scored = new Scored();
     IList<string> _watched = new Watched();
     IList<ChildProfile> _childs = new Childern();
-
+    IList<string> _notInteresting = new NotInteresting();
 
     public Profile(User user)
     {
@@ -48,9 +48,17 @@ public class Profile
 
     public IList<string> Watched { get => _watched; set { 
             if(value.Any(s => string.IsNullOrWhiteSpace(s)))
-                    throw new NullOrEmptyInnerCollectionException(nameof(WillWatch), nameof(Profile));
+                    throw new NullOrEmptyInnerCollectionException(nameof(Watched), nameof(Profile));
                     
             _watched = new Watched(value); 
+        } 
+    }
+
+    public IList<string> NotInteresting { get => _notInteresting; set { 
+            if(value.Any(s => string.IsNullOrWhiteSpace(s)))
+                    throw new NullOrEmptyInnerCollectionException(nameof(NotInteresting), nameof(Profile));
+                    
+            _notInteresting = new NotInteresting(value); 
         } 
     }
 }

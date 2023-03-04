@@ -44,7 +44,8 @@ public class ProfileInteractorTest
             Id = "someProfileId",
             Watched = new List<string> {"filmid"},
             WhillWatch = new List<string> {"filmid"},
-            Scored = new List<string> {"filmid"}
+            Scored = new List<string> {"filmid"},
+            NotInteresting = new List<string> {"filmid"}
         });
         return repo.Object;
     }
@@ -101,6 +102,16 @@ public class ProfileInteractorTest
         var interactor = ProfileFavInteractor(GetProfileRepoForFavourites(), GetMockContentBridge());
 
         var res = await interactor.AddScored("profileid", "filmid", 5);
+
+        res.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task AddExistingNotIterestingFilm()
+    {
+        var interactor = ProfileFavInteractor(GetProfileRepoForFavourites(), GetMockContentBridge());
+
+        var res = await interactor.AddNotInteresting("profileid", "filmid");
 
         res.Should().BeFalse();
     }

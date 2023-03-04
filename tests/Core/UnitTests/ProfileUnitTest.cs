@@ -36,6 +36,7 @@ public class ProfileUnitTest
         yield return new object[] { profile.Scored };
         yield return new object[] { profile.Watched };
         yield return new object[] { profile.WillWatch };
+        yield return new object[] { profile.NotInteresting };
     }
 
 }

@@ -21,15 +21,19 @@ public interface ProfileRepository
 
     Task<long> CountBy(string? email = null, string? login = null, CancellationToken token = default);
 
-    Task<bool> AddWatched(string profileId, string filmId, CancellationToken token);
+    Task<bool> AddWatched(string profileId, string filmId, CancellationToken token = default);
 
-    Task<bool> DeleteWatched(string profileId, string filmId, CancellationToken token);
+    Task<bool> DeleteWatched(string profileId, string filmId, CancellationToken token = default);
 
-    Task<bool> AddWillWatch(string profileId, string filmId, CancellationToken token);
+    Task<bool> AddWillWatch(string profileId, string filmId, CancellationToken token = default);
 
-    Task<bool> DeleteWillWatch(string profileId, string filmId, CancellationToken token);
+    Task<bool> DeleteWillWatch(string profileId, string filmId, CancellationToken token = default);
 
-    Task<bool> AddScored(string profileId, string filmId, CancellationToken token);
+    Task<bool> AddNotInteresting(string profileId, string filmId, CancellationToken token = default);
 
-    Task<bool> DeleteScored(string profileId, string filmId, CancellationToken token);
+    Task<bool> DeleteNotInteresting(string profileId, string filmId, CancellationToken token = default);
+
+    Task<bool> AddScored(string profileId, string filmId, CancellationToken token = default);
+
+    Task<bool> DeleteScored(string profileId, string filmId, CancellationToken token = default);
 }

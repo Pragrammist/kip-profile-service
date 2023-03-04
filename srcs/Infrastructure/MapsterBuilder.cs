@@ -16,6 +16,7 @@ public class MapsterBuilder
         TypeAdapterConfig<Profile, ProfileDto>.NewConfig()
             .Map(dest => dest.WhillWatch, src => src.WillWatch.ToList())
             .Map(dest => dest.Watched, src => src.Watched.ToList())
-            .Map(dest => dest.Scored, src => src.Scored.ToList());
+            .Map(dest => dest.Scored, src => src.Scored.ToList())
+            .Map(dest => dest.NotInteresting, src => src.NotInteresting.ToList());
     }
 }

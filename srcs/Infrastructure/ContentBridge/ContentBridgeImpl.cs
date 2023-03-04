@@ -27,14 +27,25 @@ public class ContentBridgeImpl : Appservices.ContentBridge
     public async Task<bool> AddWatched(string filmId, CancellationToken token) =>
         (await _client.IncrWatchedCountAsync(FilmReq(filmId), cancellationToken: token)).Success;
 
-    public async Task<bool> AddWillWatch(string filmId, CancellationToken token) =>
-        (await _client.IncrWillWatchCountAsync(FilmReq(filmId), cancellationToken: token)).Success;
-
     public async Task<bool> DeleteWatched(string filmId, CancellationToken token) =>
         (await _client.DecrWatchedCountAsync(FilmReq(filmId), cancellationToken: token)).Success;
 
+
+
+    public async Task<bool> AddWillWatch(string filmId, CancellationToken token) =>
+        (await _client.IncrWillWatchCountAsync(FilmReq(filmId), cancellationToken: token)).Success;   
+
     public async Task<bool> DeleteWillWatch(string filmId, CancellationToken token)=>
         (await _client.DecrWillWatchCountAsync(FilmReq(filmId), cancellationToken: token)).Success;
+
+
+    
+    public async Task<bool> AddNotInteresting(string filmId, CancellationToken token) =>
+        (await _client.IncrNotInterestingCountAsync(FilmReq(filmId), cancellationToken: token)).Success;
+
+    public async Task<bool> DeleteNotInteresting(string filmId, CancellationToken token) =>
+        (await _client.DecrNotInterestingCountAsync(FilmReq(filmId), cancellationToken: token)).Success;
+
 
     FilmIdRequest FilmReq(string filmId) => new()
     {

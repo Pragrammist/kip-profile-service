@@ -12,6 +12,8 @@ public class ProfileDto
 
     public IList<string> WhillWatch { get; set; } = new List<string>();
 
+    public IList<string> NotInteresting { get; set; } = new List<string>();
+
     public IList<string> Scored { get; set; } = new List<string>();
 }
 

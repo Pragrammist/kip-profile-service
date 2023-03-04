@@ -36,6 +36,13 @@ public class ProfileRepositoryImpl : ProfileRepository
 
     static UpdateDefinition<Profile> DeleteScored(string filmId) => Builders<Profile>.Update.Pull(p => p.Scored, filmId);
 
+
+    static UpdateDefinition<Profile> AddNotInteresting(string filmId) => Builders<Profile>.Update.AddToSet(p => p.NotInteresting, filmId);
+
+    static UpdateDefinition<Profile> DeleteNotInteresting(string filmId) => Builders<Profile>.Update.Pull(p => p.NotInteresting, filmId);
+
+
+
     public async Task<bool> AddChildProfile(CreateChildProfileDto profileInfo, CancellationToken token = default)
     {
         var childProfile = profileInfo.Adapt<ChildProfile>();
@@ -134,4 +141,17 @@ public class ProfileRepositoryImpl : ProfileRepository
     )
     .Adapt<ProfileDto>();
 
+    public async Task<bool> AddNotInteresting(string profileId, string filmId, CancellationToken token = default)
+    {
+        var res = await _profileRepo.UpdateOneAsync(p => p.Id == profileId, AddNotInteresting(filmId), cancellationToken: token);
+
+        return res.ModifiedCount > 0;
+    }
+
+    public async Task<bool> DeleteNotInteresting(string profileId, string filmId, CancellationToken token = default)
+    {
+        var res = await _profileRepo.UpdateOneAsync(p => p.Id == profileId, DeleteNotInteresting(filmId), cancellationToken: token);
+
+        return res.ModifiedCount > 0;
+    }
 }

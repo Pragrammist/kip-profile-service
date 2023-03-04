@@ -75,6 +75,31 @@ public class ProfileFavouritesInteractor
             return false;
         return await _repo.AddScored(profileId, filmId, token);
     }
+
+
+    public async Task<bool> AddNotInteresting(string profileId, string filmId, CancellationToken token = default)
+    {
+        var profile = await _repo.GetProfile(profileId, token);
+        
+        if(profile is null)
+            return false;
+
+        if(profile.WhillWatch.Contains(filmId))
+            return false;
+
+
+        var isAdded = await _contentBridge.AddNotInteresting(filmId, token);
+        if(!isAdded)
+            return false;
+        return await _repo.AddNotInteresting(profileId, filmId, token);
+    }
+    public async Task<bool> DeleteNotInteresting(string profileId, string filmId, CancellationToken token = default)
+    {
+        var isAdded = await _contentBridge.DeleteNotInteresting(filmId, token);
+        if(!isAdded)
+            return false;
+        return await _repo.DeleteNotInteresting(profileId, filmId, token);
+    }
 }
 
 public class ProfileInteractor

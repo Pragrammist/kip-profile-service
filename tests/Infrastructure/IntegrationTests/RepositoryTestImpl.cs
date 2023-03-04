@@ -176,22 +176,32 @@ public class ProfileRepositoryImplTest
         res.Should().BeTrue();
     }
 
-
-    [Fact]
-    public async Task DeleteScored()
+     [Fact]
+    public async Task AddNotInteresting()
     {
-        var (profileId, filmId) = await AddScoredFilm();
+        var profile = await _profileRepo.CreateProfile(createProfile);
 
-        var res = await _profileRepo.DeleteScored(profileId, filmId);
+        var res = await _profileRepo.AddNotInteresting(profile.Id, "SOMEFILM");
 
         res.Should().BeTrue();
     }
-    async Task<(string, string)> AddScoredFilm()
+
+    [Fact]
+    public async Task DeleteNotInteresting()
+    {
+        var (profileId, filmId) = await AddNotInterestingFilm();
+
+        var res = await _profileRepo.DeleteNotInteresting(profileId, filmId);
+
+        res.Should().BeTrue();
+    }
+
+    async Task<(string, string)> AddNotInterestingFilm()
     {
         var profile = await _profileRepo.CreateProfile(createProfile);
         var profileId = profile.Id;
         var filmId = "SOMEFILM";
-        var res = await _profileRepo.AddScored(profileId, filmId);
+        var res = await _profileRepo.AddNotInteresting(profileId, filmId);
         return (profileId, filmId);
     }
 }
