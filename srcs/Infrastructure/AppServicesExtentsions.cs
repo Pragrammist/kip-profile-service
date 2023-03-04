@@ -13,6 +13,7 @@ public static class AppServicesExtentsions
         services.AddSingleton<ProfileInteractor>();
         services.AddSingleton<Appservices.ContentBridge, ContentBridgeImpl>();
         services.AddSingleton<ProfileFavouritesInteractor>();
+        services.AddTransient<PasswordHasher, PasswordHasherImpl>();
         services.AddBridgeGrpcClient(GrpcContentServiceUri);
         return services;
     }

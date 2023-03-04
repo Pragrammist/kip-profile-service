@@ -62,7 +62,7 @@ public class ProfileRepositoryImpl : ProfileRepository
     public async Task<ProfileDto> CreateProfile(CreateProfileDto profileData, CancellationToken token = default)
     {
         var profile = profileData.Adapt<Profile>();
-
+        
         await _profileRepo.InsertOneAsync(profile, cancellationToken: token);
 
         return profile.Adapt<ProfileDto>();
