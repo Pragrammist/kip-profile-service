@@ -6,7 +6,7 @@ using Xunit;
 
 namespace IntegrationTests;
 
-public class MongoDbTestBase : IDisposable
+public class MongoDbFixture : IDisposable
 {
 
     public IMongoClient Client { get; }
@@ -15,7 +15,7 @@ public class MongoDbTestBase : IDisposable
     public const string COLECTION_NAME = "profiles";
     public IMongoCollection<Profile> Repo { get; }
 
-    public MongoDbTestBase()
+    public MongoDbFixture()
     {
         Client = new MongoClient("mongodb://localhost:27017");
         Db = Client.GetDatabase(DB_NAME);
@@ -40,7 +40,7 @@ public class MongoDbTestBase : IDisposable
 }
 
 [CollectionDefinition("MongoDb")]
-public class MongoDbTestCollectionBase : ICollectionFixture<MongoDbTestBase>
+public class MongoDbTestCollectionBase : ICollectionFixture<MongoDbFixture>
 {
 
 }

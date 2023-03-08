@@ -18,7 +18,7 @@ public class ProfileRepositoryImplTest
     CreateProfileDto createProfile => new CreateProfileDto { Email = "someemail", Login = "somelogin", Password = "somepassword" };
     CreateChildProfileDto createChildProfileDto(string profileId) => new CreateChildProfileDto { Age = 0, Gender = 0, Name = "name", ProfileId = profileId };
     ProfileRepositoryImpl _profileRepo;
-    public ProfileRepositoryImplTest(MongoDbTestBase dbFixture)
+    public ProfileRepositoryImplTest(MongoDbFixture dbFixture)
     {
         _repo = dbFixture.Repo;
         _profileRepo = new ProfileRepositoryImpl(_repo);

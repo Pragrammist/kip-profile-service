@@ -8,8 +8,8 @@ namespace IntegrationTests;
 [Collection("MongoDb")]
 public class ConnectionMongoTest
 {
-    MongoDbTestBase _dbFixture;
-    public ConnectionMongoTest(MongoDbTestBase dbFixture)
+    MongoDbFixture _dbFixture;
+    public ConnectionMongoTest(MongoDbFixture dbFixture)
     {
         _dbFixture = dbFixture;
     }
