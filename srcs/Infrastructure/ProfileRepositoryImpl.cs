@@ -1,10 +1,10 @@
 using MongoDB.Driver;
 using ProfileService.Core;
-using Appservices.OutputDtos;
-using Appservices.CreateChildProfileDtos;
-using Appservices.CreateProfileDtos;
+using Core.OutputDtos;
+using Core.CreateChildProfileDtos;
+using Core.CreateProfileDtos;
 using Mapster;
-using Appservices;
+using Core;
 
 namespace Infrastructure;
 

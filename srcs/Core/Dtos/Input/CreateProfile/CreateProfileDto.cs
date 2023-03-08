@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
 
-namespace Appservices.CreateProfileDtos;
+namespace Core.CreateProfileDtos;
 
 public class CreateProfileDto
 {

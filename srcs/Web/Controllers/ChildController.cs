@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Appservices.CreateChildProfileDtos;
-using Appservices.OutputDtos;
-using Appservices;
+using Core.CreateChildProfileDtos;
+using Core.OutputDtos;
+using Core;
 
 namespace Web.Controllers;
 

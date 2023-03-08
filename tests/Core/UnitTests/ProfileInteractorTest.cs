@@ -3,11 +3,11 @@ using System.Threading;
 using Xunit;
 using Moq;
 using FluentAssertions;
-using Appservices;
+using Core;
 using System.Threading.Tasks;
-using Appservices.CreateProfileDtos;
-using Appservices.OutputDtos;
-using Appservices.Exceptions;
+using Core.CreateProfileDtos;
+using Core.OutputDtos;
+using Core.Exceptions;
 
 namespace UnitTests;
 

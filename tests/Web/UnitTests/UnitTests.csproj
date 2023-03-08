@@ -22,6 +22,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\srcs\Web\Web.csproj"/>
     <ProjectReference Include="..\..\..\srcs\Infrastructure\Infrastructure.csproj"/>
-    <ProjectReference Include="..\..\..\srcs\Appservices\Appservices.csproj"/>
+    <ProjectReference Include="..\..\..\srcs\Core\Core.csproj"/>
   </ItemGroup>
 </Project>

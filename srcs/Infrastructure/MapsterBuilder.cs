@@ -1,8 +1,8 @@
 using ProfileService.Core;
 using Mapster;
-using Appservices.CreateProfileDtos;
-using Appservices.CreateChildProfileDtos;
-using Appservices.OutputDtos;
+using Core.CreateProfileDtos;
+using Core.CreateChildProfileDtos;
+using Core.OutputDtos;
 
 namespace Infrastructure;
 

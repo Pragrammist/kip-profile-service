@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Infrastructure.ContentBridge;
-using Appservices;
+using Core;
 
 namespace Infrastructure;
 
@@ -11,7 +11,7 @@ public static class AppServicesExtentsions
     {
         services.AddSingleton<ProfileRepository, ProfileRepositoryImpl>();
         services.AddSingleton<ProfileInteractor>();
-        services.AddSingleton<Appservices.ContentBridge, ContentBridgeImpl>();
+        services.AddSingleton<Core.ContentBridge, ContentBridgeImpl>();
         services.AddSingleton<ProfileFavouritesInteractor>();
         services.AddTransient<PasswordHasher, PasswordHasherImpl>();
         services.AddBridgeGrpcClient(GrpcContentServiceUri);

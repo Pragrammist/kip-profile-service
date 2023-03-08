@@ -1,10 +1,10 @@
-using Appservices;
+using Core;
 using Infrastructure.ContentBridge.GrpcFilmService;
 
 
 namespace Infrastructure;
 
-public class ContentBridgeImpl : Appservices.ContentBridge
+public class ContentBridgeImpl : Core.ContentBridge
 {
     readonly FilmServiceProto.FilmServiceProtoClient _client;
 

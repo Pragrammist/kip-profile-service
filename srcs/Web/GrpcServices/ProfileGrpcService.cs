@@ -1,8 +1,8 @@
 using Grpc.Core;
 using GrpcProfileService;
-using Appservices;
+using Core;
 using Mapster;
-using Appservices.CreateProfileDtos;
+using Core.CreateProfileDtos;
 using Web.Services;
 
 namespace Web;

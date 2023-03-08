@@ -1,4 +1,4 @@
-namespace Appservices;
+namespace Core;
 
 public class ProfileFavouritesInteractor
 {

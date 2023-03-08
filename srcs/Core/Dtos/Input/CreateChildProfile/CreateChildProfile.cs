@@ -1,4 +1,4 @@
-namespace Appservices.CreateChildProfileDtos;
+namespace Core.CreateChildProfileDtos;
 
 public class CreateChildProfileDto
 {

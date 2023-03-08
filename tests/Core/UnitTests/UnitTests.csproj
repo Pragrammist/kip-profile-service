@@ -16,8 +16,10 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="FluentAssertions" Version="6.8.0" />
+    <PackageReference Include="Moq" Version="4.18.3"/>
   </ItemGroup>
   <ItemGroup>
+    
     <ProjectReference Include="..\..\..\srcs\Core\Core.csproj" />
   </ItemGroup>
 </Project>

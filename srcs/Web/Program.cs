@@ -1,7 +1,7 @@
 namespace Web;
 using System.Reflection;
 using Serilog;
-using Appservices;
+using Core;
 using Infrastructure;
 using Web.Services;
 using Web.Middlewares;

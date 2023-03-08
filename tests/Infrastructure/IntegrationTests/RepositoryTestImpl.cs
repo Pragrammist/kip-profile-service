@@ -2,8 +2,8 @@ using Xunit;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Infrastructure;
-using Appservices.CreateProfileDtos;
-using Appservices.CreateChildProfileDtos;
+using Core.CreateProfileDtos;
+using Core.CreateChildProfileDtos;
 using MongoDB.Driver;
 using ProfileService.Core;
 

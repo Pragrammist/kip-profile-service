@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using Appservices.CreateProfileDtos;
-using Appservices.OutputDtos;
+using Core.CreateProfileDtos;
+using Core.OutputDtos;
 using Serilog;
-using Appservices;
-using Appservices.Exceptions;
+using Core;
+using Core.Exceptions;
 
 namespace Web.Controllers;
 

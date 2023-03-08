@@ -1,8 +1,8 @@
-using Appservices.CreateChildProfileDtos;
-using Appservices.CreateProfileDtos;
-using Appservices.OutputDtos;
-using Appservices.Exceptions;
-namespace Appservices;
+using Core.CreateChildProfileDtos;
+using Core.CreateProfileDtos;
+using Core.OutputDtos;
+using Core.Exceptions;
+namespace Core;
 
 public class ProfileInteractor
 {

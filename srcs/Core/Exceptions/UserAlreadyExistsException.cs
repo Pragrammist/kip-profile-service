@@ -1,4 +1,4 @@
-namespace Appservices.Exceptions;
+namespace Core.Exceptions;
 
 public class UserAlreadyExistsException : Exception
 {

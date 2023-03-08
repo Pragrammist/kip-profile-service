@@ -1,4 +1,4 @@
-﻿namespace Appservices.OutputDtos;
+﻿namespace Core.OutputDtos;
 public class UserDto
 {
     public string Login { get; set; } = null!;
