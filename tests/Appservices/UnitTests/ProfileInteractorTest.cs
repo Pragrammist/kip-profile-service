@@ -53,14 +53,21 @@ public class ProfileInteractorTest
     {
         repo.Setup(repo => repo.CreateProfile(It.IsAny<CreateProfileDto>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ProfileDto { Id = "someProfileId" });
     }
-    ProfileInteractor ProfileInteractor(ProfileRepository repo) => new(repo);
+    ProfileInteractor ProfileInteractor(ProfileRepository repo, PasswordHasher hasher) => new(repo, hasher);
+
+    PasswordHasher PasswordHasher()
+    {
+        var hasher = new Mock<PasswordHasher>();
+        hasher.Setup(t => t.Hash(It.IsAny<string>())).ReturnsAsync((string pass) => pass);
+        return hasher.Object;
+    }
 
     ProfileFavouritesInteractor ProfileFavInteractor(ProfileRepository repo, ContentBridge bridge) => new(repo, bridge);
 
     [Fact]
     public async Task CreateExistingUser()
     {
-        var interactor = ProfileInteractor(GetProfileRepoForCreateProfileForExistingUser());
+        var interactor = ProfileInteractor(GetProfileRepoForCreateProfileForExistingUser(), PasswordHasher());
 
 
         await Assert.ThrowsAsync<UserAlreadyExistsException>(async () => await interactor.Create(new CreateProfileDto { Login = loginThatExists }));
@@ -69,7 +76,7 @@ public class ProfileInteractorTest
     [Fact]
     public async Task CreateNotExistingUser()
     {
-        var interactor = ProfileInteractor(GetProfileRepoForCreateProfileForNotExistingUser());
+        var interactor = ProfileInteractor(GetProfileRepoForCreateProfileForNotExistingUser(), PasswordHasher());
         var res = await interactor.Create(new CreateProfileDto { Email = emailThatDoesntExists });
         res.Id.Should().NotBeNull();
     }

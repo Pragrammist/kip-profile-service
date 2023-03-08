@@ -30,7 +30,8 @@ public class ProfileInteractorIntegrationTests : IClassFixture<DbFixture>
     ProfileInteractor GetProfileInteractor()
     {
         var repo = new ProfileRepositoryImpl(_fixture.Collection);
-        var interactor = new ProfileInteractor(repo);
+        var hasher = new PasswordHasherImpl();
+        var interactor = new ProfileInteractor(repo, hasher);
         return interactor;
     }
     ProfileFavouritesInteractor GetFavInteractor()
