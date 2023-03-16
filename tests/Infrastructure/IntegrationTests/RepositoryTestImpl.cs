@@ -1,3 +1,4 @@
+using System.IO;
 using Xunit;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -18,11 +19,32 @@ public class ProfileRepositoryImplTest
     CreateProfileDto createProfile => new CreateProfileDto { Email = "someemail", Login = "somelogin", Password = "somepassword" };
     CreateChildProfileDto createChildProfileDto(string profileId) => new CreateChildProfileDto { Age = 0, Gender = 0, Name = "name", ProfileId = profileId };
     ProfileRepositoryImpl _profileRepo;
+    string RandomText() => Path.GetRandomFileName().Replace(".", string.Empty);
     public ProfileRepositoryImplTest(MongoDbFixture dbFixture)
     {
         _repo = dbFixture.Repo;
         _profileRepo = new ProfileRepositoryImpl(_repo);
         MapsterBuilder.ConfigureMapster();
+    }
+
+    [Fact]
+    public async Task ChangeEamil()
+    {
+        var profile = await _profileRepo.CreateProfile(createProfile);
+    
+        var res = await _profileRepo.ChangeEmail(profile.Id, RandomText());
+    
+        res.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task ChangePassword()
+    {
+        var profile = await _profileRepo.CreateProfile(createProfile);
+    
+        var res = await _profileRepo.ChangePassword(profile.Id, RandomText());
+    
+        res.Should().BeTrue();
     }
 
     [Fact]

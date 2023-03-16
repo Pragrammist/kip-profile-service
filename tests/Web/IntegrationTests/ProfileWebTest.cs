@@ -48,6 +48,61 @@ public class ProfileWebTest
     }
 
     [Fact]
+    public async Task LoginGrpc()
+    {
+        var user = User();
+        await _webFixture.HttpClient.PostAsJsonAsync(PROFILE_URL, user); // создание нового юзера
+
+        var loginByEmail = await _webFixture.GrpcClient.LoginAsync(GetLoginByEmailRequest(user));
+
+        var loginByLogin = await _webFixture.GrpcClient.LoginAsync(GetLoginByLoginRequest(user));
+
+        loginByLogin.Should().NotBeNull();
+        loginByEmail.Should().NotBeNull();
+    }
+
+    LoginRequest GetLoginByEmailRequest(UserToSend user) => new()
+    {
+        LoginOrEmail = user.Email,
+        Password = user.Password
+    };
+
+    LoginRequest GetLoginByLoginRequest(UserToSend user) => new()
+    {
+        LoginOrEmail = user.Login,
+        Password = user.Password
+    };
+    
+    [Fact]
+    public async Task ChangeEmailGrpc()
+    {
+        var user = User();
+        await _webFixture.HttpClient.PostAsJsonAsync(PROFILE_URL, user); // создание нового юзера
+        var changeEmailRequest = new ChangeEmailRequest 
+        {
+            LoginOrEmail = user.Email,
+            Password = user.Password,
+            NewEmail = RandomText
+        };
+        var changedResult = await _webFixture.GrpcClient.ChangeEmailAsync(changeEmailRequest);
+        changedResult.IsChagned.Should().BeTrue();
+
+    }
+    [Fact]
+    public async Task ChangePasswordGrpc()
+    {
+        var user = User();
+        await _webFixture.HttpClient.PostAsJsonAsync(PROFILE_URL, user); // создание нового юзера
+        var changePasswordRequest = new ChangePasswordRequest 
+        {
+            LoginOrEmail = user.Email,
+            Password = user.Password,
+            NewPassword = RandomText
+        };
+        var changedResult = await _webFixture.GrpcClient.ChangePasswordAsync(changePasswordRequest);
+        changedResult.IsChagned.Should().BeTrue();
+    }
+    [Fact]
     public async Task CreateProfileGrpcMetrics()
     {
         var profileData = User().Adapt<CreateProfileRequest>();

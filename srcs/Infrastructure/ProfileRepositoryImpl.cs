@@ -165,5 +165,17 @@ public class ProfileRepositoryImpl : ProfileRepository
     )
     .Adapt<ProfileDto>();
 
-    
+    public async  Task<bool> ChangeEmail(string id, string newEmail, CancellationToken token = default)
+    => (await _profileRepo.UpdateOneAsync(
+        filter:p => p.Id == id,
+        update: Builders<Profile>.Update.Set(f => f.User.Email, newEmail),
+        cancellationToken: token
+    )).ModifiedCount > 0;
+
+    public async Task<bool> ChangePassword(string id, string newPassword, CancellationToken token = default)
+    => (await _profileRepo.UpdateOneAsync(
+        filter:p => p.Id == id,
+        update: Builders<Profile>.Update.Set(f => f.User.Password, newPassword),
+        cancellationToken: token
+    )).ModifiedCount > 0;
 }

@@ -19,6 +19,10 @@ public interface ProfileRepository
 
     Task<ProfileDto> FetchProfile(string id, CancellationToken token = default);
 
+    Task<bool> ChangeEmail(string id, string newEmail,CancellationToken token = default);
+
+    Task<bool> ChangePassword(string id, string newPassword,CancellationToken token = default);
+
     Task<ProfileDto> FetchProfile(string loginOrEmail, string hashedPassword, CancellationToken token = default);
 
     Task<long> CountBy(string? email = null, string? login = null, CancellationToken token = default);

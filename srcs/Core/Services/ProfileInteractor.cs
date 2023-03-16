@@ -19,12 +19,15 @@ public class ProfileInteractor
         if (await _repo.CountBy(profileInfoDto.Email, profileInfoDto.Login, token) > 0)
             throw new UserAlreadyExistsException();
 
-        profileInfoDto.Password = await _hasher.Hash(profileInfoDto.Password);
-
-        var res = await _repo.CreateProfile(profileInfoDto, token);
+        var profileWithHashedPassword = await GetProfileWithHashedPassword(profileInfoDto);
+        var res = await _repo.CreateProfile(profileWithHashedPassword, token);
         return res;
     }
-
+    async Task<CreateProfileDto> GetProfileWithHashedPassword(CreateProfileDto profileInfoDto) => new (){
+            Email = profileInfoDto.Email,
+            Login = profileInfoDto.Login,
+            Password = await _hasher.Hash(profileInfoDto.Password)
+        };
 
     public async Task<bool> AddChildProfile(CreateChildProfileDto childInfoDto, CancellationToken token = default)
     {
@@ -50,5 +53,34 @@ public class ProfileInteractor
         var hashedPassword = await _hasher.Hash(passaword);
         var res = await _repo.FetchProfile(loginOrEmail, hashedPassword, token);
         return res;
+    }
+
+
+    public async Task<bool> ChangeEamil(string loginOrEmail, string passaword, string newEmail,CancellationToken token = default)
+    {
+        var hashedPassword = await _hasher.Hash(passaword);
+        
+        var profile = await _repo.FetchProfile(loginOrEmail, hashedPassword, token);
+
+        if(profile is null)
+            return false;
+
+        var isChanged = await _repo.ChangeEmail(profile.Id, newEmail, token);
+
+        return isChanged;
+    }
+
+    public async Task<bool> ChangePassword(string loginOrEmail, string passaword, string newPassword,CancellationToken token = default)
+    {
+        var hashedPassword = await _hasher.Hash(passaword);
+        
+        var profile = await _repo.FetchProfile(loginOrEmail, hashedPassword, token);
+        
+        if(profile is null)
+            return false;
+
+        var isChanged = await _repo.ChangePassword(profile.Id, newPassword, token);
+
+        return isChanged;
     }
 }

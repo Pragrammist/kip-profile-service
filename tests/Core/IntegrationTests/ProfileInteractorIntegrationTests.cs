@@ -20,7 +20,7 @@ public class ProfileInteractorIntegrationTests : IClassFixture<DbFixture>
 {
     const string CONTENT_SERIVCE_HTTP1_URL = "http://localhost:5002/";
     const string CONTENT_SERIVCE_HTTP2_URL = "http://localhost:5003/";
-    readonly string RandomText = Path.GetRandomFileName().Replace(".", string.Empty);
+    string RandomText() => Path.GetRandomFileName().Replace(".", string.Empty);
     DbFixture _fixture;
     public ProfileInteractorIntegrationTests(DbFixture fixture)
     {
@@ -48,9 +48,9 @@ public class ProfileInteractorIntegrationTests : IClassFixture<DbFixture>
     {
         var interactor = GetProfileInteractor();
         var profileDto = new CreateProfileDto{
-            Email = RandomText,
-            Login = RandomText,
-            Password = RandomText
+            Email = RandomText(),
+            Login = RandomText(),
+            Password = RandomText()
         };
 
         await interactor.Create(profileDto);
@@ -60,6 +60,38 @@ public class ProfileInteractorIntegrationTests : IClassFixture<DbFixture>
 
         byEmail.Should().NotBeNull();
         byLogin.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task ChangeEmail()
+    {
+        var interactor = GetProfileInteractor();
+        var profileDto = new CreateProfileDto{
+            Email = RandomText(),
+            Login = RandomText(),
+            Password = RandomText()
+        };
+
+        await interactor.Create(profileDto);
+
+        var res = await interactor.ChangeEamil(profileDto.Email, profileDto.Password, RandomText());
+        res.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task ChangePassword()
+    {
+        var interactor = GetProfileInteractor();
+        var profileDto = new CreateProfileDto{
+            Email = RandomText(),
+            Login = RandomText(),
+            Password = RandomText()
+        };
+
+        await interactor.Create(profileDto);
+
+        var res = await interactor.ChangePassword(profileDto.Email, profileDto.Password, RandomText());
+        res.Should().BeTrue();
     }
 
     [Fact]
