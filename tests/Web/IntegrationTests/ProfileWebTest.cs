@@ -20,6 +20,8 @@ namespace IntegrationTests;
 public class ProfileWebTest
 {
     const string CONTENT_SERIVCE_HTTP1_URL = "http://localhost:5002/";
+    const string PROFILE_URL = "profile";
+    string RandomText => Path.GetRandomFileName().Replace(".", string.Empty);
     class UserToSend
     {
         public string Login { get; set; } = null!;
@@ -35,7 +37,7 @@ public class ProfileWebTest
     {
         _webFixture = webContext;
     }
-    const string PROFILE_URL = "profile";
+    
 
     [Fact]
     public async Task CreateProfileGrpc()
@@ -85,6 +87,31 @@ public class ProfileWebTest
         var responseMessage = await _webFixture.HttpClient.PostAsJsonAsync(PROFILE_URL, userToPost);
 
         responseMessage.IsSuccessStatusCode.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task LoginByEmail()
+    {
+        var userToPost = User();
+        await _webFixture.HttpClient.PostAsJsonAsync(PROFILE_URL, userToPost); // создание нового юзера
+        var loginUrl = PROFILE_URL+ "/login" + $"?loginOrEmail={userToPost.Email}&password={userToPost.Password}";
+
+        var responseMessageByEamail = await _webFixture.HttpClient.GetAsync(loginUrl);
+        
+        responseMessageByEamail.EnsureSuccessStatusCode();
+    }
+
+
+    [Fact]
+    public async Task LoginByLogin()
+    {
+        var userToPost = User();
+        await _webFixture.HttpClient.PostAsJsonAsync(PROFILE_URL, userToPost); // создание нового юзера
+        var loginUrl = PROFILE_URL+ "/login" + $"?loginOrEmail={userToPost.Login}&password={userToPost.Password}";
+
+        var responseMessageByEamail = await _webFixture.HttpClient.GetAsync(loginUrl);
+        
+        responseMessageByEamail.EnsureSuccessStatusCode();
     }
 
     [Fact]
@@ -217,11 +244,12 @@ public class ProfileWebTest
     }
     UserToSend User()
     {
-        var user = new UserToSend { };
-
-        user.Login = Path.GetRandomFileName();
-        user.Email = Path.GetRandomFileName();
-        user.Password = Path.GetRandomFileName();
+        var user = new UserToSend
+        {
+            Login = RandomText,
+            Email = RandomText,
+            Password = RandomText
+        };
 
         return user;
     }

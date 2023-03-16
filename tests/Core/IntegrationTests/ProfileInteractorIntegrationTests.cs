@@ -20,6 +20,7 @@ public class ProfileInteractorIntegrationTests : IClassFixture<DbFixture>
 {
     const string CONTENT_SERIVCE_HTTP1_URL = "http://localhost:5002/";
     const string CONTENT_SERIVCE_HTTP2_URL = "http://localhost:5003/";
+    readonly string RandomText = Path.GetRandomFileName().Replace(".", string.Empty);
     DbFixture _fixture;
     public ProfileInteractorIntegrationTests(DbFixture fixture)
     {
@@ -40,6 +41,25 @@ public class ProfileInteractorIntegrationTests : IClassFixture<DbFixture>
         var bridge = new ContentBridgeImpl(grpcContentClient);
         var favouritesInteractor = new ProfileFavouritesInteractor(repo, bridge);
         return favouritesInteractor;
+    }
+
+    [Fact]
+    public async Task GetProfileByEmailOrLogin()
+    {
+        var interactor = GetProfileInteractor();
+        var profileDto = new CreateProfileDto{
+            Email = RandomText,
+            Login = RandomText,
+            Password = RandomText
+        };
+
+        await interactor.Create(profileDto);
+        
+        var byEmail = interactor.GetProfile(profileDto.Email, profileDto.Password);
+        var byLogin = interactor.GetProfile(profileDto.Login, profileDto.Password);
+
+        byEmail.Should().NotBeNull();
+        byLogin.Should().NotBeNull();
     }
 
     [Fact]

@@ -9,7 +9,7 @@ namespace Web.Controllers;
 
 
 [ApiController]
-[Route("[controller]")]
+[Route("profile")]
 public class ProfileController : ControllerBase
 {
     readonly ProfileInteractor _profile;
@@ -61,5 +61,18 @@ public class ProfileController : ControllerBase
     public async Task<ProfileDto> Get(string id, CancellationToken cancellation)
     {
         return await _profile.GetProfile(id, cancellation);
+    }
+
+    /// <summary>
+    /// Возращает полный профиль по id, т.е. тянется вся инфа профиля(user, детские профиля, списки фильмов)
+    /// </summary>
+    /// <response code="200">нашелся профиль</response>
+    /// <response code="404">не нашелся профиль</response>
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [HttpGet("login")]
+    public async Task<ProfileDto> GetProfile(string loginOrEmail, string password, CancellationToken cancellation)
+    {
+        return await _profile.GetProfile(loginOrEmail, password, cancellation);
     }
 }

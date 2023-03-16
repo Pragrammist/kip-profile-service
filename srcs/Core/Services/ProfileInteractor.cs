@@ -44,4 +44,11 @@ public class ProfileInteractor
 
         return res;
     }
+
+    public async Task<ProfileDto> GetProfile(string loginOrEmail, string passaword, CancellationToken token = default)
+    {
+        var hashedPassword = await _hasher.Hash(passaword);
+        var res = await _repo.FetchProfile(loginOrEmail, hashedPassword, token);
+        return res;
+    }
 }

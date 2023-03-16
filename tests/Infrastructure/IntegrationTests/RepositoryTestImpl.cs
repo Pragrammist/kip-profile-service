@@ -26,7 +26,7 @@ public class ProfileRepositoryImplTest
     }
 
     [Fact]
-    public async Task GetProfileTest()
+    public async Task GetProfile()
     {
         var profile = await _profileRepo.CreateProfile(createProfile);
 
@@ -34,7 +34,6 @@ public class ProfileRepositoryImplTest
 
         profileRes.Should().NotBeNull();
     }
-
 
     [Fact]
     public async Task CreateProfile()
@@ -110,7 +109,17 @@ public class ProfileRepositoryImplTest
         by.Should().BeGreaterThan(0);
         all.Should().BeGreaterThan(before);
     }
+    [Fact]
+    public async Task FetchProfileByPasswordAndLoginOrEmail()
+    {
+        var createdProfile = await _profileRepo.CreateProfile(createProfile);
 
+        var byEmail = await _profileRepo.FetchProfile(createdProfile.User.Email, createProfile.Password);
+        var byLogin = await _profileRepo.FetchProfile(createdProfile.User.Login, createProfile.Password);
+
+        byEmail.Should().NotBeNull();
+        byLogin.Should().NotBeNull();
+    }
     [Fact]
     public async Task AddWatched()
     {

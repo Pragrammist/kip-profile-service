@@ -154,4 +154,16 @@ public class ProfileRepositoryImpl : ProfileRepository
 
         return res.ModifiedCount > 0;
     }
+
+    public async Task<ProfileDto> FetchProfile(string loginOrEmail, string hashedPassword, CancellationToken token = default)=> 
+    (
+        await 
+        (
+            await _profileRepo.FindAsync(p => (p.User.Login == loginOrEmail || p.User.Email == loginOrEmail) && p.User.Password == hashedPassword, cancellationToken: token)
+        )
+        .FirstOrDefaultAsync(cancellationToken: token)
+    )
+    .Adapt<ProfileDto>();
+
+    
 }
