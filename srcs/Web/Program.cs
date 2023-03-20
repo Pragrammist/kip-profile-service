@@ -19,7 +19,7 @@ public class Program
         var dbName = configuration["DB_NAME"] ?? "kip_profile_db";
         var collections = configuration["COLLECTION_NAME"] ?? "profiles";
         services.AddMongoDb(connection, dbName, collections);
-        services.AddAppServices();
+        services.AddAppServices(configuration);
     }
 
     public static void Main(string[] args)

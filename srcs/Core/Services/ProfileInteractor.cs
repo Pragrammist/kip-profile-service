@@ -8,10 +8,14 @@ public class ProfileInteractor
 {
     readonly ProfileRepository _repo;
     readonly PasswordHasher _hasher;
-    public ProfileInteractor(ProfileRepository repo, PasswordHasher hasher)
+    readonly ResetPasswordCodeStore _passwordCodeStore;
+    readonly EmailSender _emailSender;
+    public ProfileInteractor(ProfileRepository repo, PasswordHasher hasher, ResetPasswordCodeStore passwordCodeStore, EmailSender emailSender)
     {
         _repo = repo;
         _hasher = hasher;
+        _emailSender = emailSender;
+        _passwordCodeStore = passwordCodeStore;
     }
 
     public async Task<ProfileDto> Create(CreateProfileDto profileInfoDto, CancellationToken token = default)
@@ -82,5 +86,30 @@ public class ProfileInteractor
         var isChanged = await _repo.ChangePassword(profile.Id, newPassword, token);
 
         return isChanged;
+    }
+
+    public async Task<string?> SendCodeToEmail(string email, CancellationToken token = default)
+    {
+        var profile = await _repo.FindByLoginOrEmail(email, token);
+        if(profile is null)
+            return null;
+        var code = await _passwordCodeStore.GenerateCode(profile.Id, token);
+
+        await _emailSender.SendCode(code, email, token);
+
+        return code;
+    }
+
+    public async Task<bool> ResetPassword(string email, string code, string newPassaword, CancellationToken token = default)
+    {
+        var profile = await _repo.FindByLoginOrEmail(email, token);
+        if(profile is null)
+            return false;
+        if(!await _passwordCodeStore.CodeIsValid(profile.Id, code, token))
+            return false;
+
+        
+        var hashedPassword = await _hasher.Hash(newPassaword);
+        return await _repo.SetPassword(profile.Id, hashedPassword, token);
     }
 }

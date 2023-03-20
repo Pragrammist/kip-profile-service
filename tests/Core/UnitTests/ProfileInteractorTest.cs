@@ -36,7 +36,18 @@ public class ProfileInteractorTest
 
         return repo.Object;
     }
+    ResetPasswordCodeStore GetMockResetPasswordCodeStore()
+    {
+        var mock = new Mock<ResetPasswordCodeStore>();
 
+        return mock.Object;
+    }
+    EmailSender GetMockEmailSender()
+    {
+        var mock = new Mock<EmailSender>();
+
+        return mock.Object;
+    }
     ProfileRepository GetProfileRepoForFavourites()
     {
         var repo = new Mock<ProfileRepository>();
@@ -53,7 +64,7 @@ public class ProfileInteractorTest
     {
         repo.Setup(repo => repo.CreateProfile(It.IsAny<CreateProfileDto>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ProfileDto { Id = "someProfileId" });
     }
-    ProfileInteractor ProfileInteractor(ProfileRepository repo, PasswordHasher hasher) => new(repo, hasher);
+    ProfileInteractor ProfileInteractor(ProfileRepository repo, PasswordHasher hasher, ResetPasswordCodeStore codeStore, EmailSender sender) => new(repo, hasher, codeStore, sender);
 
     PasswordHasher PasswordHasher()
     {
@@ -67,7 +78,7 @@ public class ProfileInteractorTest
     [Fact]
     public async Task CreateExistingUser()
     {
-        var interactor = ProfileInteractor(GetProfileRepoForCreateProfileForExistingUser(), PasswordHasher());
+        var interactor = ProfileInteractor(GetProfileRepoForCreateProfileForExistingUser(), PasswordHasher(), GetMockResetPasswordCodeStore(), GetMockEmailSender());
 
 
         await Assert.ThrowsAsync<UserAlreadyExistsException>(async () => await interactor.Create(new CreateProfileDto { Login = loginThatExists }));
@@ -76,7 +87,7 @@ public class ProfileInteractorTest
     [Fact]
     public async Task CreateNotExistingUser()
     {
-        var interactor = ProfileInteractor(GetProfileRepoForCreateProfileForNotExistingUser(), PasswordHasher());
+        var interactor = ProfileInteractor(GetProfileRepoForCreateProfileForNotExistingUser(), PasswordHasher(), GetMockResetPasswordCodeStore(), GetMockEmailSender());
         var res = await interactor.Create(new CreateProfileDto { Email = emailThatDoesntExists });
         res.Id.Should().NotBeNull();
     }

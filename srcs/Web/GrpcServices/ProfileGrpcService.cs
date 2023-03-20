@@ -1,3 +1,5 @@
+using System.Diagnostics.Contracts;
+using System.Security.Cryptography.X509Certificates;
 using Grpc.Core;
 using GrpcProfileService;
 using Core;
@@ -46,5 +48,22 @@ public class ProfileGrpcService : Profile.ProfileBase
     {
         var profile = await _profile.GetProfile(request.LoginOrEmail, request.Password, context.CancellationToken);
         return profile.Adapt<ProfileResponse>();
+    }
+    public override async Task<SendCodeToResetPasswordResponse> SendCodeToEmailToResetPassword(SendCodeToResetPasswordRequest request, ServerCallContext context)
+    {
+        var code = await _profile.SendCodeToEmail(request.Email, context.CancellationToken);
+        var res = new SendCodeToResetPasswordResponse
+        {
+            Code = code
+        };
+        return res;
+    }
+    public override async Task<ResetPasswordResponse> ResetPassword(ResetPasswordRequest request, ServerCallContext context)
+    {
+        var isReseted = await _profile.ResetPassword(request.Email, request.Code, request.NewPassword, context.CancellationToken);
+        return new ResetPasswordResponse
+        {
+            IsReseted = isReseted
+        };
     }
 }

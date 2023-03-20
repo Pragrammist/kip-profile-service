@@ -11,6 +11,7 @@ public interface ProfileRepository
 
     Task<ProfileDto?> GetProfile(string profileId, CancellationToken token = default);
 
+    Task<ProfileDto?> FindByLoginOrEmail(string loginOrEmail, CancellationToken token = default);
     Task<bool> AddChildProfile(CreateChildProfileDto profileInfo, CancellationToken token = default);
 
     Task<bool> RemoveChildProfile(string profileId, string name, CancellationToken token = default);
@@ -42,4 +43,6 @@ public interface ProfileRepository
     Task<bool> AddScored(string profileId, string filmId, CancellationToken token = default);
 
     Task<bool> DeleteScored(string profileId, string filmId, CancellationToken token = default);
+
+    Task<bool> SetPassword(string id, string password, CancellationToken token = default);
 }

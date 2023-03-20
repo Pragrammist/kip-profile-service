@@ -249,8 +249,41 @@ public class ProfileWebTest
         response.EnsureSuccessStatusCode();
     }
 
+    [Fact]
+    public async Task ResetPasswordTest()
+    {
+        var email = "vitalcik.kovalenko2019@gmail.com";
+        await CreateProfileObjectResultWithEmail(email);
+        
+        var sendCodeRequest = new SendCodeToResetPasswordRequest
+        {
+            Email = email 
+        };
 
+        var codeResponse = await _webFixture.GrpcClient.SendCodeToEmailToResetPasswordAsync(sendCodeRequest);
+        
+        var code = codeResponse.Code;
 
+        var resetRequest = new ResetPasswordRequest
+        {
+            Code = code,
+            Email = email,
+            NewPassword = "mynewpassword"
+        };
+        var resetResponse = await _webFixture.GrpcClient.ResetPasswordAsync(resetRequest);
+
+        
+        var isReseted = resetResponse.IsReseted;
+
+        isReseted.Should().BeTrue();
+    }
+    async Task<ProfileResponse> CreateProfileObjectResultWithEmail(string email)
+    {
+        var profileData = User().Adapt<CreateProfileRequest>();
+        profileData.Email = email;
+        var res = await _webFixture.GrpcClient.CreateProfileAsync(profileData);
+        return res;
+    }
 
     async Task<string> CreateProfile()
     {

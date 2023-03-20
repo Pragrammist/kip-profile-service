@@ -13,6 +13,7 @@ using System.Net.Http;
 using Grpc.Net.Client;
 using System.Net.Http.Json;
 using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace IntegrationTests;
 
@@ -21,16 +22,32 @@ public class ProfileInteractorIntegrationTests : IClassFixture<DbFixture>
     const string CONTENT_SERIVCE_HTTP1_URL = "http://localhost:5002/";
     const string CONTENT_SERIVCE_HTTP2_URL = "http://localhost:5003/";
     string RandomText() => Path.GetRandomFileName().Replace(".", string.Empty);
-    DbFixture _fixture;
+    readonly DbFixture _fixture;
+    readonly ProfileInteractor _interactor;
+    readonly string _emailToSend;
+    readonly ProfileFavouritesInteractor _favInteractor;
     public ProfileInteractorIntegrationTests(DbFixture fixture)
     {
+        _emailToSend = "vmk.human4@gmail.com";
         _fixture = fixture;
+        _interactor = GetProfileInteractor();
+        _favInteractor = GetFavInteractor();
     }
+
+    EmailSenderOptions EmailSenderOptions => new ()
+    {
+        SmtpPort = 587,
+        SmtpServer = "smtp-relay.sendinblue.com",
+        SmtpEmailCrend = "vitalcik.kovalenko2019@gmail.com",
+        SmtpPasswordCrend = "Eb0A1PZj3sQrWq4v"
+    };
     ProfileInteractor GetProfileInteractor()
     {
         var repo = new ProfileRepositoryImpl(_fixture.Collection);
         var hasher = new PasswordHasherImpl();
-        var interactor = new ProfileInteractor(repo, hasher);
+        var passwordCodeStore = new ResetPasswordCodeStoreImpl();
+        var emailSender = new EmailSenderImpl(EmailSenderOptions);
+        var interactor = new ProfileInteractor(repo, hasher, passwordCodeStore, emailSender);
         return interactor;
     }
     ProfileFavouritesInteractor GetFavInteractor()
@@ -46,17 +63,17 @@ public class ProfileInteractorIntegrationTests : IClassFixture<DbFixture>
     [Fact]
     public async Task GetProfileByEmailOrLogin()
     {
-        var interactor = GetProfileInteractor();
+        
         var profileDto = new CreateProfileDto{
             Email = RandomText(),
             Login = RandomText(),
             Password = RandomText()
         };
 
-        await interactor.Create(profileDto);
+        await _interactor.Create(profileDto);
         
-        var byEmail = interactor.GetProfile(profileDto.Email, profileDto.Password);
-        var byLogin = interactor.GetProfile(profileDto.Login, profileDto.Password);
+        var byEmail = _interactor.GetProfile(profileDto.Email, profileDto.Password);
+        var byLogin = _interactor.GetProfile(profileDto.Login, profileDto.Password);
 
         byEmail.Should().NotBeNull();
         byLogin.Should().NotBeNull();
@@ -65,67 +82,65 @@ public class ProfileInteractorIntegrationTests : IClassFixture<DbFixture>
     [Fact]
     public async Task ChangeEmail()
     {
-        var interactor = GetProfileInteractor();
+        
         var profileDto = new CreateProfileDto{
             Email = RandomText(),
             Login = RandomText(),
             Password = RandomText()
         };
 
-        await interactor.Create(profileDto);
+        await _interactor.Create(profileDto);
 
-        var res = await interactor.ChangeEamil(profileDto.Email, profileDto.Password, RandomText());
+        var res = await _interactor.ChangeEamil(profileDto.Email, profileDto.Password, RandomText());
         res.Should().BeTrue();
     }
 
     [Fact]
     public async Task ChangePassword()
     {
-        var interactor = GetProfileInteractor();
+        
         var profileDto = new CreateProfileDto{
             Email = RandomText(),
             Login = RandomText(),
             Password = RandomText()
         };
 
-        await interactor.Create(profileDto);
+        await _interactor.Create(profileDto);
 
-        var res = await interactor.ChangePassword(profileDto.Email, profileDto.Password, RandomText());
+        var res = await _interactor.ChangePassword(profileDto.Email, profileDto.Password, RandomText());
         res.Should().BeTrue();
     }
 
     [Fact]
     public async Task AddUser()
     {
-        var interactor = GetProfileInteractor();
-
-        var user = await interactor.Create(Profile);
+        var user = await _interactor.Create(Profile());
 
         user.Id.Should().NotBeNull();
     }
 
+    
+
     [Fact]
     public async Task AddExistingUser()
     {
-        var interactor = GetProfileInteractor();
-        var profile = Profile; // чтобы работало
-        var user = await interactor.Create(profile);
+        
+        var profile = Profile(); 
+        var user = await _interactor.Create(profile);
 
 
 
         await Assert.ThrowsAsync<UserAlreadyExistsException>(async () =>
         {
-            await interactor.Create(profile);
+            await _interactor.Create(profile);
         });
     }
     
     [Fact]
     public async Task AddWillWatch()
     {
-        var favInteractor = GetFavInteractor();
-        var interactor = GetProfileInteractor();
 
-        var filmWillWatchCounter = await CreateProfileAndFilmWithAdding("willWatchCount", interactor, favInteractor.AddWillWatch);
+        var filmWillWatchCounter = await CreateProfileAndFilmWithAdding("willWatchCount", _favInteractor.AddWillWatch);
 
         filmWillWatchCounter.Should().BeGreaterThan(0);
     }
@@ -133,10 +148,8 @@ public class ProfileInteractorIntegrationTests : IClassFixture<DbFixture>
     [Fact]
     public async Task AddNotInteresting()
     {
-        var favInteractor = GetFavInteractor();
-        var interactor = GetProfileInteractor();
 
-        var filmNotInterestingCounter = await CreateProfileAndFilmWithAdding("notInterestingCount", interactor, favInteractor.AddNotInteresting);
+        var filmNotInterestingCounter = await CreateProfileAndFilmWithAdding("notInterestingCount", _favInteractor.AddNotInteresting);
 
         filmNotInterestingCounter.Should().BeGreaterThan(0);
     }
@@ -144,22 +157,33 @@ public class ProfileInteractorIntegrationTests : IClassFixture<DbFixture>
     [Fact]
     public async Task AddWatched()
     {
-       var favInteractor = GetFavInteractor();
-        var interactor = GetProfileInteractor();
 
-        var filmWatchedCounter = await CreateProfileAndFilmWithAdding("watchedCount", interactor, favInteractor.AddWatched);
+
+        var filmWatchedCounter = await CreateProfileAndFilmWithAdding("watchedCount", _favInteractor.AddWatched);
 
         filmWatchedCounter.Should().BeGreaterThan(0);
     }
-    
+    [Fact]
+    public async Task ResetPasswordTest()
+    {
+        var profile = Profile();
+        profile.Email = _emailToSend;
+        await _interactor.Create(profile);
+
+
+        var code = await _interactor.SendCodeToEmail(_emailToSend) ?? throw new NullReferenceException("code is null");
+        
+        var reseted = await _interactor.ResetPassword(_emailToSend, code, "newPassword");
+        
+        reseted.Should().BeTrue();
+    }
 
     [Fact]
     public async Task AddScore()
     {
-        var favInteractor = GetFavInteractor();
-        var interactor = GetProfileInteractor();
 
-        var filmWillWatchCounter = await CreateProfileAndFilmWithAdding("scoreCount", interactor, favInteractor.AddScored);
+
+        var filmWillWatchCounter = await CreateProfileAndFilmWithAdding("scoreCount", _favInteractor.AddScored);
 
         filmWillWatchCounter.Should().BeGreaterThan(0);
     }
@@ -168,21 +192,19 @@ public class ProfileInteractorIntegrationTests : IClassFixture<DbFixture>
     [Fact]
     public async Task DeleteNotInteresting()
     {
-        var favInteractor = GetFavInteractor();
-        var interactor = GetProfileInteractor();
 
-        var filmNotInterestingCountCounter = await CreateProfileAndFilmWithAddingAndDeleting("notInterestingCount", interactor, favInteractor.AddNotInteresting, favInteractor.DeleteNotInteresting);
+
+        var filmNotInterestingCountCounter = await CreateProfileAndFilmWithAddingAndDeleting("notInterestingCount", _favInteractor.AddNotInteresting, _favInteractor.DeleteNotInteresting);
 
         filmNotInterestingCountCounter.Should().BeGreaterThanOrEqualTo(1);
     }
 
-     [Fact]
+    [Fact]
     public async Task DeleteWillWatch()
     {
-        var favInteractor = GetFavInteractor();
-        var interactor = GetProfileInteractor();
+        
 
-        var filmWillWatchCounter = await CreateProfileAndFilmWithAddingAndDeleting("willWatchCount", interactor, favInteractor.AddWillWatch, favInteractor.DeleteWillWatch);
+        var filmWillWatchCounter = await CreateProfileAndFilmWithAddingAndDeleting("willWatchCount", _favInteractor.AddWillWatch, _favInteractor.DeleteWillWatch);
 
         filmWillWatchCounter.Should().BeGreaterThanOrEqualTo(1);
     }
@@ -190,21 +212,20 @@ public class ProfileInteractorIntegrationTests : IClassFixture<DbFixture>
     [Fact]
     public async Task DeleteWatched()
     {
-        var favInteractor = GetFavInteractor();
-        var interactor = GetProfileInteractor();
+        
 
-        var filmWillWatchCounter = await CreateProfileAndFilmWithAddingAndDeleting("watchedCount", interactor, favInteractor.AddWatched, favInteractor.DeleteWatched);
+        var filmWillWatchCounter = await CreateProfileAndFilmWithAddingAndDeleting("watchedCount", _favInteractor.AddWatched, _favInteractor.DeleteWatched);
 
         filmWillWatchCounter.Should().BeGreaterThanOrEqualTo(1);
     }
 
 
-    async Task<uint> CreateProfileAndFilmWithAddingAndDeleting(string counterPropToAdd, ProfileInteractor interactor,
+    async Task<uint> CreateProfileAndFilmWithAddingAndDeleting(string counterPropToAdd,
                                                         Func<string, string, CancellationToken, Task<bool>> addMethod,
                                                         Func<string, string, CancellationToken, Task<bool>> delMethod )
     {
-        var profile1 = await CreateProfile(interactor);
-        var profile2 = await CreateProfile(interactor);
+        var profile1 = await CreateProfile();
+        var profile2 = await CreateProfile();
         var film = await CreateFilm();
         await addMethod(profile1, film, default);
         await addMethod(profile2, film, default);
@@ -217,26 +238,34 @@ public class ProfileInteractorIntegrationTests : IClassFixture<DbFixture>
         return filmCounter;
     }
 
-    async Task<string> CreateProfile(ProfileInteractor interactor)
+    async Task<string> CreateProfileWithValidAndExistingEmail()
     {
-        var profile = Profile;
-        var user = await interactor.Create(profile);
+        var profile = Profile();
+        profile.Email = "vitalcik.kovalenko2019@gmail.com";
+        var user = await _interactor.Create(profile);
+        return user.Id;
+    }
+
+    async Task<string> CreateProfile()
+    {
+        var profile = Profile();
+        var user = await _interactor.Create(profile);
         return user.Id;
     }
     
 
-    async Task<uint> CreateProfileAndFilmWithAdding(string counterPropToAdd, ProfileInteractor interactor,Func<string, string, CancellationToken, Task<bool>> methodToChangeCounter)
+    async Task<uint> CreateProfileAndFilmWithAdding(string counterPropToAdd,Func<string, string, CancellationToken, Task<bool>> methodToChangeCounter)
     {
-        var profile = await CreateProfile(interactor);
+        var profile = await CreateProfile();
         var film = await CreateFilm(); 
 
         await methodToChangeCounter(profile, film, default);
         var filmCounter = await GetFilmCounter(film, counterPropToAdd);
         return filmCounter;
     }
-    async Task<uint> CreateProfileAndFilmWithAdding(string counterPropToAdd,ProfileInteractor interactor,Func<string, string, uint, CancellationToken, Task<bool>> methodToChangeCounter)
+    async Task<uint> CreateProfileAndFilmWithAdding(string counterPropToAdd,Func<string, string, uint, CancellationToken, Task<bool>> methodToChangeCounter)
     {
-        var profile = await CreateProfile(interactor);
+        var profile = await CreateProfile();
         var film = await CreateFilm(); // чтобы работало
         var score = 3u;
         await methodToChangeCounter(profile, film, score, default);
@@ -285,10 +314,12 @@ public class ProfileInteractorIntegrationTests : IClassFixture<DbFixture>
         client.Dispose();
         return id;
     }
-    CreateProfileDto Profile => new CreateProfileDto
+    CreateProfileDto Profile() => new CreateProfileDto
     {
         Email = Path.GetRandomFileName(),
         Login = Path.GetRandomFileName(),
         Password = Path.GetRandomFileName()
     };
+
+    
 }

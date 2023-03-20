@@ -3,6 +3,7 @@ import "google/protobuf/timestamp.proto";
 
 
 option csharp_namespace = "GrpcProfileService";
+
 message IsChangedResult{
     bool IsChagned = 1;
 }
@@ -48,10 +49,30 @@ message UserResponse{
     google.protobuf.Timestamp createdAt = 4;
 }
 
+message SendCodeToResetPasswordRequest
+{
+    string email = 1;
+}
+message SendCodeToResetPasswordResponse
+{
+    string code = 1;
+}
+message ResetPasswordRequest
+{
+    string email = 1;
+    string code = 2;
+    string newPassword = 3;
+}
+message ResetPasswordResponse
+{
+    bool IsReseted = 1;
+}
 
 service Profile{
     rpc CreateProfile (CreateProfileRequest) returns(ProfileResponse);
     rpc Login(LoginRequest) returns(ProfileResponse);
     rpc ChangeEmail(ChangeEmailRequest) returns(IsChangedResult);
     rpc ChangePassword(ChangePasswordRequest) returns(IsChangedResult);
+    rpc SendCodeToEmailToResetPassword(SendCodeToResetPasswordRequest) returns(SendCodeToResetPasswordResponse);
+    rpc ResetPassword(ResetPasswordRequest) returns(ResetPasswordResponse);
 }

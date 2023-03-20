@@ -178,4 +178,23 @@ public class ProfileRepositoryImpl : ProfileRepository
         update: Builders<Profile>.Update.Set(f => f.User.Password, newPassword),
         cancellationToken: token
     )).ModifiedCount > 0;
+
+    public async Task<ProfileDto?> FindByLoginOrEmail(string loginOrEmail, CancellationToken token = default)
+    {
+        var findResult = await _profileRepo.FindAsync(t => t.User.Login == loginOrEmail || t.User.Email == loginOrEmail, cancellationToken: token);
+
+        var profile = await findResult.FirstOrDefaultAsync(token);
+
+        return profile.Adapt<ProfileDto>();
+    }
+
+    public async Task<bool> SetPassword(string id, string password, CancellationToken token = default)
+    {
+        var updateResult = await _profileRepo.UpdateOneAsync(
+            u => u.Id == id, 
+            Builders<Profile>.Update.Set(p => p.User.Password, password), 
+            cancellationToken: token
+        );
+        return updateResult.ModifiedCount > 0;
+    }
 }
