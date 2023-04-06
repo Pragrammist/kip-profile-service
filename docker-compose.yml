@@ -3,33 +3,45 @@ services:
   kip-profile:
     depends_on:
       - 'kip-profile-mongo'
+    networks: 
+      - kip-profile-network
     
-      
-    container_name: "kip-profile"
+    container_name: "kip-profile-container"
     image: kip-profile
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - LOGSTASH_URL=http://localhost:8080
-      - MONGODB_CONNECTION_STRING=mongodb://localhost:27018
-      - DB_NAME=kip_profile_db
+      - MONGODB_CONNECTION_STRING=mongodb://kip-profile-mongo:27017 
+      - DB_NAME = kip_profile_db
       - COLLECTION_NAME=profiles
+      - SMTP_PORT=587
+      - SMTP_SERVER=smtp-relay.sendinblue.com
+      - SMTP_EMAIL_CREND=vitalcik.kovalenko2019@gmail.com
+      - SMTP_PASSWORD_CREND=Eb0A1PZj3sQrWq4v
+      - CONTENT_SERVICE_GRPC_URI=http://localhost:5003
     ports:
       - 5000:5000
       - 5001:5001
       
-    build:
-      context: .
-      dockerfile: Dockerfile
-      network: kip-profile
+    
 
-  kip-profile-mongo:
+  kip-profile-mongo:  
     restart: always
     image: 'mongo'
-    container_name: kip-profile-mongo
-    ports:
-      - '27018:27017'
-    build:
-        context: .
-        dockerfile: Dockerfile
-        network: kip-profile
+    container_name: kip-profile-mongo-container
+    networks: 
+      - kip-profile-network
+    volumes:
+      - kip-profile-mongo:/data/db
+      - kip-profile-mongo_config:/data/configdb
+    
+networks:
+  kip-profile-network:
+    driver: bridge
+volumes:
+  kip-profile-mongo:
+  kip-profile-mongo_config:
+
+    
+
       

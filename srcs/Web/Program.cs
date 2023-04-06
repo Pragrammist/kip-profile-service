@@ -15,7 +15,7 @@ public class Program
     public static void BuildServicesNotFromWeb(IServiceCollection services, IConfiguration configuration)
     {
         MapsterBuilder.ConfigureMapster();
-        var connection = configuration["MONGODB_CONNECTION_STRING"] ?? "mongodb://localhost:27017";
+        var connection = configuration["MONGODB_CONNECTION_STRING"] ?? "mongodb://localhost:27018";
         var dbName = configuration["DB_NAME"] ?? "kip_profile_db";
         var collections = configuration["COLLECTION_NAME"] ?? "profiles";
         services.AddMongoDb(connection, dbName, collections);
